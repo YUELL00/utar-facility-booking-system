@@ -42,25 +42,8 @@ public class MaintenanceReport {
 		return priority;
 	}
 	
-	public MaintenanceReport(String facilityId, String reportedByUserId, String description, String reportDate) { //User(Student/Staff) submit the facility issue report
-		this.facilityId = facilityId;
-		this.reportedByUserId = reportedByUserId;
-		this.description = description;
-		this.reportDate = reportDate;
-		this.status = "Unassigned";
-	}
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String status, String priority) { //for maintenance task in progressed
-		this.reportId = reportId;
-		this.facilityId = facilityId;
-		this.reportedByUserId = reportedByUserId;
-		this.assignedByUserId = assignedByUserId;
-		this.description = description;
-		this.reportDate = reportDate;
-		this.startDate = startDate;
-		this.status = status;
-		this.priority = priority;
-	}
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status, String priority) { //for maintenance history
+	//constructor
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status, String priority) {
 		this.reportId = reportId;
 		this.facilityId = facilityId;
 		this.reportedByUserId = reportedByUserId;
@@ -73,14 +56,14 @@ public class MaintenanceReport {
 		this.priority = priority;
 	}
 	
-	public void updateTaskStatus(String status) { //WIP
+	public void updateTaskStatus(String status) {
 		this.status = status;
 	}
 	public void assignTo(String userId) {
 		//WIP
 	}
 	public boolean isCompleted() { //WIP 
-		if(status == "Completed") {
+		if(status == "COMPLETED") {
 			return true;
 		}else {
 			return false;
