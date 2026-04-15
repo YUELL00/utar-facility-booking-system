@@ -25,6 +25,10 @@ public abstract class User {
 		return password;
 	}
 	
+	public void setContactNumber(String contactNumber){
+		this.contactNumber=contactNumber;
+	}
+	
 	public void viewProfile(){
 		System.out.println("User ID: "+userId);
 		System.out.println("Name: "+name);
@@ -33,8 +37,4 @@ public abstract class User {
 		System.out.println("Role: "+this.getClass().getSimpleName());
 	}
 	
-	public void setContactNumber(String contactNumber){
-		this.contactNumber=contactNumber;
-	}
-
 }
