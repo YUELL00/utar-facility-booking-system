@@ -9,8 +9,9 @@ public class MaintenanceStorage extends BaseStorage {
         super(filePath);
     }
 
-    public ArrayList<MaintenanceReport> load() {
-        ArrayList<MaintenanceReport> list = new ArrayList<>();
+    public MaintenanceReport[] load(int[] count){
+    	MaintenanceReport[] list=new MaintenanceReport[200];
+    	count[0]=0;
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(filePath));
@@ -19,23 +20,26 @@ public class MaintenanceStorage extends BaseStorage {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(",", -1);
 
+                if(p.length<10){
+                	continue;
+                }
+                
                 String reportId = p[0];
                 String facilityId = p[1];
                 String reportedBy = p[2];
                 String assignedTo = p[3];
-                String desc = p[4];
+                String description = p[4];
                 String reportDate = p[5];
                 String startDate = p[6];
                 String endDate = p[7];
                 String status = p[8];
                 String priority = p[9];
 
-                MaintenanceReport r = new MaintenanceReport(
-                        reportId, facilityId, reportedBy, assignedTo,
-                        desc, reportDate, startDate, endDate, status, priority
-                );
+                MaintenanceReport report=new MaintenanceReport(reportId,facilityId,reportedBy,assignedTo,
+                								description,reportDate,startDate,endDate,status,priority);
 
-                list.add(r);
+                list[count[0]]=report;
+                count[0]++;
             }
 
             br.close();
@@ -46,21 +50,27 @@ public class MaintenanceStorage extends BaseStorage {
         return list;
     }
 
-    public void save(ArrayList<MaintenanceReport> list) {
+    public void save(MaintenanceReport[] list,int count){
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
 
-            for (MaintenanceReport r : list) {
-                String line = r.getReportId() + "," +
-                              r.getFacilityId() + "," +
-                              r.getReportedByUserId() + "," +
-                              r.getAssignedToUserId() + "," +
-                              r.getDescription() + "," +
-                              r.getReportDate() + "," +
-                              r.getStartDate() + "," +
-                              r.getEndDate() + "," +
-                              r.getStatus() + "," +
-                              r.getPriority();
+            for(int i=0;i<count;i++){
+            	MaintenanceReport r=list[i];
+
+            	if(r==null){
+            		continue;
+            	}
+
+            	String line=r.getReportId()+","+
+            	r.getFacilityId()+","+
+            	r.getReportedByUserId()+","+
+            	r.getAssignedToUserId()+","+
+            	r.getDescription()+","+
+            	r.getReportDate()+","+
+            	r.getStartDate()+","+
+            	r.getEndDate()+","+
+            	r.getStatus()+","+
+            	r.getPriority();
 
                 bw.write(line);
                 bw.newLine();

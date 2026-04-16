@@ -2,25 +2,34 @@ package storage;
 
 import java.io.*;
 
-public class UserStorage {
+public class UserStorage extends BaseStorage{
 
     private String filePath;
 
     public UserStorage(String filePath) {
-        this.filePath = filePath;
+    	super(filePath);
     }
 
     public User[] load(int[] count) {
+    	/* function of this method:
+    	 * 1. read user data from filePath
+    	 * 2. convert it into an array of User objects
+    	 * 3. return these objects and recording the count
+    	 */
+    	
         User[] users = new User[100]; // max 100 users
         count[0] = 0;
 
         try {
+        	// read user data from filePath
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line;
 
             while ((line = br.readLine()) != null) {
+            	// use -1 to trail the empty String
                 String[] p = line.split(",", -1);
 
+                // String --> attribute
                 String role = p[0];
                 String userId = p[1];
                 String password = p[2];
@@ -31,6 +40,7 @@ public class UserStorage {
 
                 User user = null;
 
+                // create object, instantiate depends on the role
                 if (role.equals("Student")) {
                     user = new Student(userId, password, name, faculty, contact, programme);
                 } else if (role.equals("Staff")) {
@@ -39,6 +49,7 @@ public class UserStorage {
                     user = new Admin(userId, password, name, faculty, contact);
                 }
 
+                // store into array
                 users[count[0]] = user;
                 count[0]++;
             }
@@ -83,4 +94,4 @@ public class UserStorage {
             System.out.println("Error saving users.");
         }
     }
-}}
+}

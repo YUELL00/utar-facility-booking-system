@@ -2,12 +2,12 @@ package storage;
 
 import java.io.*;
 
-public class FacilityStorage {
+public class FacilityStorage extends BaseStorage{
 
     private String filePath;
 
     public FacilityStorage(String filePath) {
-        this.filePath = filePath;
+    	super(filePath);
     }
 
     public Facility[] load(int[] count) {
@@ -21,12 +21,21 @@ public class FacilityStorage {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(",", -1);
 
-                list[count[0]] = new Facility(
-                        p[0], p[1], p[2], p[3]
-                );
+                if(p.length<4){
+                	continue;
+                }
 
-                count[0]++;
-            }
+                String facilityId=p[0];
+                String facilityName=p[1];
+                String facilityType=p[2];
+                String location=p[3];
+
+               	Facility facility = new Facility(facilityId,facilityName,
+               										facilityType,location);
+
+                list[count[0]]=facility;
+                	count[0]++;
+                }
 
             br.close();
         } catch (Exception e) {
@@ -43,10 +52,16 @@ public class FacilityStorage {
             for (int i = 0; i < count; i++) {
                 Facility f = list[i];
 
-                bw.write(f.getFacilityId() + "," +
-                         f.getFacilityName() + "," +
-                         f.getFacilityType() + "," +
-                         f.getLocation());
+                if(f==null){
+                	continue;
+                }
+
+                String line=f.getFacilityId()+","+
+                f.getFacilityName()+","+
+                f.getFacilityType()+","+
+                f.getLocation();
+
+                bw.write(line);
                 bw.newLine();
             }
 

@@ -2,12 +2,12 @@ package storage;
 
 import java.io.*;
 
-public class BookingStorage {
+public class BookingStorage extends BaseStorage{
 
     private String filePath;
 
     public BookingStorage(String filePath) {
-        this.filePath = filePath;
+    	super(filePath);
     }
 
     public Booking[] load(int[] count) {
@@ -21,15 +21,31 @@ public class BookingStorage {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(",", -1);
 
-                TimeSlot slot = new TimeSlot(p[3], p[4], p[5]);
+                // Validation
+                if (p.length < 10) {
+                	continue; // skip invalid line
+                }
 
-                list[count[0]] = new Booking(
-                        p[0], p[1], p[2],
-                        slot, p[6], p[7], p[8], p[9]
-                );
+                // Mapping
+				String bookingId = p[0];
+				String userId = p[1];
+				String facilityId = p[2];
+				String date = p[3];
+				String startTime = p[4];
+				String endTime = p[5];
+				String purpose = p[6];
+				String status = p[7];
+				String createdTime = p[8];
+				String lastModifiedTime = p[9];
 
-                count[0]++;
-            }
+                // Composition
+				TimeSlot slot = new TimeSlot(date, startTime, endTime);
+                // Object Creation
+				Booking booking = new Booking(bookingId, userId, facilityId,
+						slot, purpose, status, createdTime, lastModifiedTime);
+
+				list[count[0]] = booking;
+				count[0]++;
 
             br.close();
         } catch (Exception e) {
@@ -45,18 +61,24 @@ public class BookingStorage {
 
             for (int i = 0; i < count; i++) {
                 Booking b = list[i];
+                
+                if (b == null) 
+                	continue;
+                
                 TimeSlot t = b.getTimeSlot();
 
-                bw.write(b.getBookingId() + "," +
-                         b.getUserId() + "," +
-                         b.getFacilityId() + "," +
-                         t.getDate() + "," +
-                         t.getStartTime() + "," +
-                         t.getEndTime() + "," +
-                         b.getPurpose() + "," +
-                         b.getStatus() + "," +
-                         b.getCreatedTime() + "," +
-                         b.getLastModifiedTime());
+                String line = b.getBookingId() + "," +
+							b.getUserId() + "," +
+							b.getFacilityId() + "," +
+							t.getDate() + "," +
+							t.getStartTime() + "," +
+							t.getEndTime() + "," +
+							b.getPurpose() + "," +
+							b.getStatus() + "," +
+							b.getCreatedTime() + "," +
+							b.getLastModifiedTime();
+
+                bw.write(line);
                 bw.newLine();
             }
 
