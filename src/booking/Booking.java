@@ -10,23 +10,20 @@ public class Booking {
 	private TimeSlot timeSlot;
 	private String purpose;
 	private String status;
-	private String createdTime;
-	private String lastModifiedTime;
+	private LocalDateTime createdTime;
+	private LocalDateTime lastModifiedTime;
 	
 	//constructor
-	public Booking(String bookingId, String userId, String facilityId, TimeSlot timeSlot, String purpose) {
+	public Booking(String bookingId, String userId, String facilityId, TimeSlot timeSlot, 
+			String purpose, String status, LocalDateTime createdTime, LocalDateTime lastModifiedTime) {
 		this.bookingId = bookingId;
 		this.userId = userId;
 		this.facilityId = facilityId;
 		this.timeSlot = timeSlot;
 		this.purpose = purpose;
-	}
-	
-	//constructor
-	public Booking(String facilityId, TimeSlot timeSlot, String purpose) {
-		this.facilityId = facilityId;
-		this.timeSlot = timeSlot;
-		this.purpose = purpose;
+		this.status = status;
+		this.createdTime = createdTime;
+		this.lastModifiedTime = lastModifiedTime;
 	}
 	
 	public void setStatus(String status) {
@@ -34,20 +31,24 @@ public class Booking {
 	}
 
 	public boolean canModify() {
-		if(status == "Pending") {
+		if(status.equals("Pending")) {
 			return true;
 		}
 		else {
 			return false;
 		}
 	}
-	
-	// get current/now date + time
-	LocalDateTime now = LocalDateTime.now();
 	
 	public boolean canCancel() {
+		
+		// get current/now date + time
+		LocalDateTime now = LocalDateTime.now();
+		
+		// get booking date + time
+		LocalDateTime start = LocalDateTime.of(timeSlot.getDate(), timeSlot.getStartTime());
+		
 		// now date + time > booking start time
-		if(now.isAfter(timeSlot)) {
+		if(now.isAfter(start)) {
 			return false;
 		}
 		else {
@@ -55,9 +56,10 @@ public class Booking {
 		}
 	}
 	
-	public void modifyBooking(TimeSlot newTimeSlot, String newPurpose) {
-		timeSlot = newTimeSlot;
-		purpose = newPurpose;
+	public void modifyBooking(TimeSlot timeSlot, String purpose, LocalDateTime lastModifiedTime) {
+		this.timeSlot = timeSlot;
+		this.purpose = purpose;
+		this.lastModifiedTime = lastModifiedTime;
 	}
 	
 	
@@ -86,11 +88,11 @@ public class Booking {
 		return status;
 	}
 	
-	public String getCreatedTime() {
+	public LocalDateTime getCreatedTime() {
 		return createdTime;
 	}
 	
-	public String getLastModifiedTime() {
+	public LocalDateTime getLastModifiedTime() {
 		return lastModifiedTime;
 	}
 	
