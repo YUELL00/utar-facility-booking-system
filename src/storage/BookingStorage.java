@@ -1,25 +1,24 @@
 package storage;
 
 import java.io.*;
+import java.util.*;
+import java.time.LocalDateTime;
 
 public class BookingStorage extends BaseStorage{
 
-    private String filePath;
-
-    public BookingStorage(String filePath) {
+	public BookingStorage(String filePath) {
     	super(filePath);
     }
 
-    public Booking[] load(int[] count) {
-        Booking[] list = new Booking[200];
-        count[0] = 0;
+	public ArrayList<Booking> load() {
+		ArrayList<Booking> list = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
-            String line;
+        	Scanner sc = new Scanner(new File(filePath));
 
-            while ((line = br.readLine()) != null) {
-                String[] p = line.split(",", -1);
+        	while(sc.hasNextLine()){
+        		String line = sc.nextLine();
+        		String[] p = line.split(",", -1);
 
                 // Validation
                 if (p.length < 10) {
@@ -35,8 +34,22 @@ public class BookingStorage extends BaseStorage{
 				String endTime = p[5];
 				String purpose = p[6];
 				String status = p[7];
-				String createdTime = p[8];
-				String lastModifiedTime = p[9];
+				LocalDateTime createdTime;
+				LocalDateTime lastModifiedTime;
+				
+				// parse createdTime
+				try {
+					createdTime = LocalDateTime.parse(p[8]);
+				} catch (Exception e) {
+					createdTime = null;
+				}
+
+				// parse lastModifiedTime
+				try {
+					lastModifiedTime = LocalDateTime.parse(p[9]);
+				} catch (Exception e) {
+					lastModifiedTime = null;
+				}
 
                 // Composition
 				TimeSlot slot = new TimeSlot(date, startTime, endTime);
@@ -44,26 +57,23 @@ public class BookingStorage extends BaseStorage{
 				Booking booking = new Booking(bookingId, userId, facilityId,
 						slot, purpose, status, createdTime, lastModifiedTime);
 
-				list[count[0]] = booking;
-				count[0]++;
-
-            br.close();
-        } catch (Exception e) {
+				list.add(booking);
+        	}
+        	
+        	sc.close();
+        }
+        catch (Exception e) {
             System.out.println("Error loading bookings.");
         }
 
         return list;
     }
 
-    public void save(Booking[] list, int count) {
+    public void save(ArrayList<Booking> list){
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
+        	PrintWriter writer = new PrintWriter(filePath);
 
-            for (int i = 0; i < count; i++) {
-                Booking b = list[i];
-                
-                if (b == null) 
-                	continue;
+        	for (Booking b : list) {
                 
                 TimeSlot t = b.getTimeSlot();
 
@@ -78,11 +88,10 @@ public class BookingStorage extends BaseStorage{
 							b.getCreatedTime() + "," +
 							b.getLastModifiedTime();
 
-                bw.write(line);
-                bw.newLine();
+                writer.println(line);
             }
 
-            bw.close();
+            writer.close();
         } catch (Exception e) {
             System.out.println("Error saving bookings.");
         }

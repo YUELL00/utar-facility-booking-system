@@ -1,73 +1,63 @@
 package storage;
 
 import java.io.*;
+import java.util.*;
+
+import booking.Booking;
 
 public class FacilityStorage extends BaseStorage{
 
-    private String filePath;
+	public FacilityStorage(String filePath) {
+		super(filePath);
+		}
 
-    public FacilityStorage(String filePath) {
-    	super(filePath);
-    }
+	public ArrayList<Facility> load() {
+		ArrayList<Facility> list = new ArrayList<>();
 
-    public Facility[] load(int[] count) {
-        Facility[] list = new Facility[100];
-        count[0] = 0;
+		try {
+        	Scanner sc=new Scanner(new File(filePath));
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
-            String line;
+        	while(sc.hasNextLine()){
+        		String line=sc.nextLine();
+        		String[] p=line.split(",",-1);
 
-            while ((line = br.readLine()) != null) {
-                String[] p = line.split(",", -1);
-
-                if(p.length<4){
-                	continue;
-                }
-
-                String facilityId=p[0];
-                String facilityName=p[1];
-                String facilityType=p[2];
-                String location=p[3];
-
-               	Facility facility = new Facility(facilityId,facilityName,
-               										facilityType,location);
-
-                list[count[0]]=facility;
-                	count[0]++;
-                }
-
-            br.close();
-        } catch (Exception e) {
-            System.out.println("Error loading facilities.");
+        		if(p.length<4){
+        			continue;
+        		}
+	
+	        	String facilityId=p[0];
+	        	String facilityName=p[1];
+	        	String facilityType=p[2];
+	        	String location=p[3];
+	
+	        	Facility facility = new Facility(facilityId, facilityName, facilityType, location);
+	
+	        	list.add(facility);
+	        }
+	        sc.close();
+        }
+        catch(Exception e){
+        	System.out.println("Error loading facilities.");
         }
 
-        return list;
-    }
+		return list;
+	}
 
-    public void save(Facility[] list, int count) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
+	public void save(ArrayList<Facility> list) {
+		try {
+			PrintWriter writer=new PrintWriter(filePath);
 
-            for (int i = 0; i < count; i++) {
-                Facility f = list[i];
+			for(Facility f : list){
 
-                if(f==null){
-                	continue;
-                }
+				String line = f.getFacilityId() + "," + f.getFacilityName()+"," +
+							f.getFacilityType() + "," + f.getLocation();
+				writer.println(line);
+			}
 
-                String line=f.getFacilityId()+","+
-                f.getFacilityName()+","+
-                f.getFacilityType()+","+
-                f.getLocation();
-
-                bw.write(line);
-                bw.newLine();
-            }
-
-            bw.close();
-        } catch (Exception e) {
-            System.out.println("Error saving facilities.");
-        }
-    }
+			writer.close();
+		}
+		catch(Exception e){
+			System.out.println("Error saving facilities.");
+		}
+	}
 }
