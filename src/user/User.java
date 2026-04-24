@@ -2,8 +2,8 @@ package user;
 
 public abstract class User {
 
-	protected String userId;
-	protected String password;
+	private String userId;
+	private String password;
 	protected String name;
 	protected String facultyOrDepartment;
 	protected String contactNumber;
