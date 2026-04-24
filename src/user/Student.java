@@ -13,5 +13,9 @@ public class Student extends User{
 	public String getProgramme(){
 		return programme;
 	}
-	
+
+	@Override
+	public String getProfileInfo() {
+		return super.getProfileInfo() + "\nProgramme: " + programme;
+	}
 }
