@@ -8,13 +8,13 @@ public abstract class User {
 	protected String facultyOrDepartment;
 	protected String contactNumber;
 	
-	public User(String userId,String password,String name
-			,String facultyOrDepartment,String contactNumber){
-		this.userId=userId;
-		this.password=password;
-		this.name=name;
-		this.facultyOrDepartment=facultyOrDepartment;
-		this.contactNumber=contactNumber;
+	public User(String userId, String password, String name,
+				String facultyOrDepartment, String contactNumber){
+		this.userId = userId;
+		this.password = password;
+		this.name = name;
+		this.facultyOrDepartment = facultyOrDepartment;
+		this.contactNumber = contactNumber;
 	
 	public String getUserId(){
 		return userId;
@@ -25,15 +25,16 @@ public abstract class User {
 	}
 	
 	public void setContactNumber(String contactNumber){
-		this.contactNumber=contactNumber;
+		this.contactNumber = contactNumber;
 	}
-	
+
+	// show the student information
 	public void viewProfile(){
-		System.out.println("User ID: "+userId);
-		System.out.println("Name: "+name);
-		System.out.println("Faculty/Department: "+facultyOrDepartment);
-		System.out.println("Contact: "+contactNumber);
-		System.out.println("Role: "+this.getClass().getSimpleName());
+		System.out.println("User ID: " + userId);
+		System.out.println("Name: " + name);
+		System.out.println("Faculty/Department: " + facultyOrDepartment);
+		System.out.println("Contact: " + contactNumber);
+		System.out.println("Role: " + this.getClass().getSimpleName());
 	}
 	
 }
