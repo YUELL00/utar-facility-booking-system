@@ -2,15 +2,14 @@ package user;
 
 public class Staff extends User{
 	
-	private String department;
 	public Staff(String userId, String password, String name, 
-			String department, String contactNumber){
-		super(userId,password,name,department,contactNumber);
-		this.department=department;
+			String facultyOrDepartment, String contactNumber){
+		super(userId, password, name, facultyOrDepartment, contactNumber);
 	}
-	
-	public String getDepartment(){
-		return department;
+
+	@Override
+	public String getRole() {
+		return this.getClass().getSimpleName();
 	}
 
 }

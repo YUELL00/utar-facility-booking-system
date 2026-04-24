@@ -17,7 +17,6 @@ public abstract class User {
 		this.contactNumber = contactNumber;
 	}
 	
-	
 	public String getUserId(){
 		return userId;
 	}
@@ -29,14 +28,16 @@ public abstract class User {
 	public void setContactNumber(String contactNumber){
 		this.contactNumber = contactNumber;
 	}
-
+	
+	public abstract String getRole();
+	
 	// show the student information
-	public void viewProfile(){
-		System.out.println("User ID: " + userId);
-		System.out.println("Name: " + name);
-		System.out.println("Faculty/Department: " + facultyOrDepartment);
-		System.out.println("Contact: " + contactNumber);
-		System.out.println("Role: " + this.getClass().getSimpleName());
+	public String getProfileInfo(){ 
+		return "User ID: " + userId + 
+				"\nName: " + name + 
+				"\nFaculty/Department: " + facultyOrDepartment + 
+				"\nContact: " + contactNumber + 
+				"\nRole: " + getRole();
 	}
 	
 }
