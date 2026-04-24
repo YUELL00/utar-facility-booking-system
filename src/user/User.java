@@ -15,6 +15,8 @@ public abstract class User {
 		this.name = name;
 		this.facultyOrDepartment = facultyOrDepartment;
 		this.contactNumber = contactNumber;
+	}
+	
 	
 	public String getUserId(){
 		return userId;
