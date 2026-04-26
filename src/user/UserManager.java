@@ -20,6 +20,30 @@ public class UserManager {
 		 *  2. Create a new user record in memory
 		 *  3. Update the data to persistent storage
 		 *  */
+		if(user == null) {
+			System.out.println("Invalid user data.");
+			return;
+		}
+		
+		// validate userId
+		if(!Validator.validateUserId(user.getUserId())) {
+			System.out.println("Invalid User ID format.");
+			return;
+		}
+		
+		// validate password
+		if(!Validator.validatePassword(user.getPassword())) {
+			System.out.println("Password must be at least 6 characters.");
+			return;
+		}
+		
+		// validate contact
+		if(!Validator.validateContactNumber(user.getContactNumber())) {
+			System.out.println("Invalid contact number.");
+			return;
+		}
+		
+		// duplicate check
 		if(getUserById(user.getUserId()) != null){
 			System.out.println("User ID already exists.");
 			return;
@@ -51,10 +75,15 @@ public class UserManager {
 		return null;
 	}
 	
-	public void updateUser(User user,String newContact){
+	public void updateUser(User user, String newContact){
 		// Updates the contact number of a given user
 		if(user == null) {
-			System.out.println("Profile updated.");
+			System.out.println("User not found.");
+			return;
+		}
+		
+		if(!Validator.validateContactNumber(newContact)) {
+			System.out.println("Invalid contact number.");
 			return;
 		}
 		
