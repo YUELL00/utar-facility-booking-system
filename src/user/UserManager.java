@@ -1,15 +1,16 @@
 package user;
 
+import java.util.ArrayList;
+import storage.UserStorage;
+
 public class UserManager {
 
-	private User[] users;
-	private int size;
+	private ArrayList<User> users;
 	private UserStorage userStorage;
 	
 	public UserManager(){
-		userStorage = new UserStorage();
-		users=new User[100];
-		size=0;
+		userStorage = new UserStorage("users.txt");
+		users = new ArrayList<>();
 		loadUsers();
 	}
 	
@@ -23,18 +24,17 @@ public class UserManager {
 			System.out.println("User ID already exists.");
 			return;
 		}
-		users[size] = user;
-		size++;
+		
+		users.add(user);
 		saveUsers();
 		System.out.println("User registered successfully.");
 	}
 	
 	public User loginUser(String userId,String password){
 		// Check the authentication
-		for(int i=0;i<size;i++){
-			if(users[i].getUserId().equals(userId) && 
-					users[i].getPassword().equals(password)){
-				return users[i];
+		for(User u : users){
+			if(u.getUserId().equals(userId) && u.getPassword().equals(password)){
+				return u;
 			}
 		}
 		return null;
@@ -43,9 +43,9 @@ public class UserManager {
 	public User getUserById(String userId){
 		// Retrieves a user by their unique user ID through the in-memory user array
 		// Returns the first matching User object, stops once a match is found
-		for(int i=0;i<size;i++){
-			if(users[i].getUserId().equals(userId)){
-				return users[i];
+		for(User u : users){
+			if(u.getUserId().equals(userId)){
+				return u;
 			}
 		}
 		return null;
@@ -53,6 +53,11 @@ public class UserManager {
 	
 	public void updateUser(User user,String newContact){
 		// Updates the contact number of a given user
+		if(user == null) {
+			System.out.println("Profile updated.");
+			return;
+		}
+		
 		user.setContactNumber(newContact);
 		saveUsers();
 		System.out.println("Profile updated.");
@@ -60,17 +65,16 @@ public class UserManager {
 	
 	public void loadUsers(){
 		// load all users to memory
-		User[] loaded = userStorage.load();
-		for(int i=0; i<loaded.length; i++){
-			if(loaded[i] != null){
-				users[size] = loaded[i];
-				size++;
+		ArrayList<User> loaded = userStorage.load();
+		for(User u : loaded){
+			if(u != null){
+				users.add(u);
 			}
 		}
 	}
 
 	public void saveUsers(){
-		userStorage.save(users,size);
+		userStorage.save(users);
 	}
 	
 }
