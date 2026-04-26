@@ -12,15 +12,9 @@ public class NotificationService {
 			return "Error: Booking data is missing.";
 		}
 		
-		String bookingId = b.getBookingId();
-		String facilityId = b.getFacilityId();
-		String date = b.getDate();
-		String startTime = b.getStartTime();
-		
-		String message = "Reminder: Booking " + bookingId + " for facility " + 
-						facilityId + " is scheduled on " + date + " at " + startTime + ".";
-		
-		return message;
+		return "Reminder: Booking " + b.getBookingId() + "\nFacility: " + b.getFacilityId() +
+				"\nDate: " + b.getDate() + "\nTime: " + b.getStartTime() + " - " + b.getEndTime() +
+				"\nPlease be on time.";
 	}
 
 }
