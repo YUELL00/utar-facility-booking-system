@@ -51,4 +51,3 @@ public class Facility {
 		return String.format("%s - %s (%s) [%s]", facilityId, name, type, status);
 		}
 }
-
