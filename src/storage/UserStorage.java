@@ -26,43 +26,40 @@ public UserStorage(String filePath) {
         	Scanner sc = new Scanner(new File(filePath));
 
         	while(sc.hasNextLine()){
-        	String line = sc.nextLine();
-           	// use -1 to trail the empty String
-        	String[] p = line.split(",", -1);
+        		String line = sc.nextLine();
+        		// use -1 to trail the empty String
+        		String[] p = line.split(",", -1);
 
-             // String --> attribute
-        	String role = p[0];
-        	String userId = p[1];
-        	String password = p[2];
-        	String name = p[3];
-        	String faculty = p[4];
-        	String contact = p[5];
-        	String programme = p[6];
+        		// String --> attribute
+        		String role = p[0];
+        		String userId = p[1];
+        		String password = p[2];
+        		String name = p[3];
+        		String faculty = p[4];
+        		String contact = p[5];
+        		String programme = p[6];
         	
-        	User user = null;
-
-        	// create object, instantiate depends on the role
-        	if(role.equals("Student")){
-        		user = new Student(userId,password,name,faculty,contact,programme);
-        	}
-        	else if(role.equals("Staff")){
-        		user = new Staff(userId,password,name,faculty,contact);
-        	}
-        	else if(role.equals("Admin")){
-        		user = new Admin(userId,password,name,faculty,contact);
-        	}
+        		User user = null;
         	
-        	if (user != null) {
-        	    users.add(user);
+        		// create object, instantiate depends on the role
+        		if(role.equals("Student")){
+        			user = new Student(userId,password,name,faculty,contact,programme);
+        		}
+        		else if(role.equals("Staff")){
+        			user = new Staff(userId,password,name,faculty,contact);
+        		}
+        		else if(role.equals("Admin")){
+        			user = new Admin(userId,password,name,faculty,contact);
+        		}
+        	
+        		if (user != null) {
+        			users.add(user);
+        		}
         	}
-
-        	// store into array
-        	users.add(user);
-            }
 
         	sc.close();
         } catch (Exception e) {
-            System.out.println("Error loading users.");
+        	System.out.println("Error loading users.");
         }
 
         return users;
