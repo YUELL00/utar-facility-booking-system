@@ -76,6 +76,18 @@ public class Booking {
 		return facilityId;
 	}
 	
+	public LocalDateTime getDate() {
+		return timeSlot.getDate();
+		}
+
+	public LocalDateTime getStartTime() {
+		return timeSlot.getStartTime();
+		}
+
+	public LocalDateTime getEndTime() {
+		return timeSlot.getEndTime();
+	}
+	
 	public TimeSlot getTimeSlot() {
 		return timeSlot;
 	}
