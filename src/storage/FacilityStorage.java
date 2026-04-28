@@ -3,7 +3,7 @@ package storage;
 import java.io.*;
 import java.util.*;
 
-import booking.Booking;
+import facility.Facility;
 
 public class FacilityStorage extends BaseStorage{
 
@@ -21,16 +21,17 @@ public class FacilityStorage extends BaseStorage{
         		String line=sc.nextLine();
         		String[] p=line.split(",",-1);
 
-        		if(p.length<4){
+        		if(p.length<5){
         			continue;
         		}
 	
-	        	String facilityId=p[0];
-	        	String facilityName=p[1];
-	        	String facilityType=p[2];
-	        	String location=p[3];
+	        	String facilityId = p[0];
+	        	String facilityName = p[1];
+	        	String facilityType = p[2];
+	        	String location = p[3];
+	        	String status = p[4];
 	
-	        	Facility facility = new Facility(facilityId, facilityName, facilityType, location);
+	        	Facility facility = new Facility(facilityId, facilityName, facilityType, location, status);
 	
 	        	list.add(facility);
 	        }
@@ -45,12 +46,12 @@ public class FacilityStorage extends BaseStorage{
 
 	public void save(ArrayList<Facility> list) {
 		try {
-			PrintWriter writer=new PrintWriter(filePath);
+			PrintWriter writer = new PrintWriter(filePath);
 
 			for(Facility f : list){
 
 				String line = f.getFacilityId() + "," + f.getFacilityName()+"," +
-							f.getFacilityType() + "," + f.getLocation();
+							f.getFacilityType() + "," + f.getLocation() + "," + f.getStatus(); 
 				writer.println(line);
 			}
 

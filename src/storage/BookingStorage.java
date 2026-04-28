@@ -3,6 +3,12 @@ package storage;
 import java.io.*;
 import java.util.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Objects;
+
+import booking.Booking;
+import booking.TimeSlot;
 
 public class BookingStorage extends BaseStorage{
 
