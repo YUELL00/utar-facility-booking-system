@@ -2,6 +2,9 @@ package storage;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.ArrayList;
+
+import user.*;
 
 public class UserStorage extends BaseStorage{
 
