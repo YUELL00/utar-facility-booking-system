@@ -4,9 +4,9 @@ public abstract class User {
 
 	private String userId;
 	private String password;
-	protected String name;
-	protected String facultyOrDepartment;
-	protected String contactNumber;
+	private String name;
+	private String facultyOrDepartment;
+	private String contactNumber;
 	
 	public User(String userId, String password, String name,
 				String facultyOrDepartment, String contactNumber){
@@ -23,6 +23,14 @@ public abstract class User {
 	
 	public String getPassword(){
 		return password;
+	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	public String getFacultyOrDepartment(){
+		return facultyOrDepartment;
 	}
 	
 	public String getContactNumber(){
