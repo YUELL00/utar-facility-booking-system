@@ -1,6 +1,8 @@
 package user;
 
 import java.util.ArrayList;
+
+import util.Validator;
 import storage.UserStorage;
 
 public class UserManager {

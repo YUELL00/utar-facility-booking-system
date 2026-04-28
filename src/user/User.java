@@ -25,6 +25,10 @@ public abstract class User {
 		return password;
 	}
 	
+	public String getContactNumber(){
+		return contactNumber;
+	}
+	
 	public void setContactNumber(String contactNumber){
 		this.contactNumber = contactNumber;
 	}
