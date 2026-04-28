@@ -1,47 +1,42 @@
 package booking;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Objects;
+
 public class TimeSlot {
 
-	package booking;
+	private final LocalDate date;
+	private final LocalTime startTime;
+	private final LocalTime endTime;
 
-	import java.time.LocalDate;
-	import java.time.LocalTime;
-	import java.util.Objects;
+	// constructor
+	public TimeSlot(LocalDate date, LocalTime startTime, LocalTime endTime) {
+		this.date = Objects.requireNonNull(date, "Date cannot be empty");
+		this.startTime = Objects.requireNonNull(startTime, "Start time cannot be empty");
+		this.endTime = Objects.requireNonNull(endTime, "End time cannot be empty");
 
-	public class TimeSlot {
-
-	    private final LocalDate date;
-	    private final LocalTime startTime;
-	    private final LocalTime endTime;
-
-	    // constructor
-	    public TimeSlot(LocalDate date, LocalTime startTime, LocalTime endTime) {
-	        this.date = Objects.requireNonNull(date, "Date cannot be empty");
-	        this.startTime = Objects.requireNonNull(startTime, "Start time cannot be empty");
-	        this.endTime = Objects.requireNonNull(endTime, "End time cannot be empty");
-
-	        if (!startTime.isBefore(endTime)) {
-	            throw new IllegalArgumentException("Start time must be before end time");
-	        }
-	    }
+		if (!startTime.isBefore(endTime)) {
+			throw new IllegalArgumentException("Start time must be before end time");
+			}
+		}
 
 	    // check overlap
-	    public boolean overlaps(TimeSlot other) {
-	        if (other == null) return false;
+	public boolean overlaps(TimeSlot other) {
+		if (other == null) return false;
 
-	        return date.equals(other.date) &&
-	               startTime.isBefore(other.endTime) &&
-	               endTime.isAfter(other.startTime);
-	    }
+		return date.equals(other.date) && 
+				startTime.isBefore(other.endTime) &&
+				endTime.isAfter(other.startTime);
+		}
 
 	    // getters
-	    public LocalDate getDate() { return date; }
-	    public LocalTime getStartTime() { return startTime; }
-	    public LocalTime getEndTime() { return endTime; }
+	public LocalDate getDate() { return date; }
+	public LocalTime getStartTime() { return startTime; }
+	public LocalTime getEndTime() { return endTime; }
 
-	    @Override
-	    public String toString() {
-	        return "[" + date + " | " + startTime + "-" + endTime + "]";
-	    }
+	@Override
+	public String toString() {
+		return "[" + date + " | " + startTime + "-" + endTime + "]";
 	}
 }

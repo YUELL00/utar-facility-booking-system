@@ -2,6 +2,7 @@ package booking;
 
 // get current/now date + time
 import java.time.LocalDateTime;
+
 public class Booking {
 
 	private String bookingId;
@@ -74,6 +75,18 @@ public class Booking {
 	
 	public String getFacilityId() {
 		return facilityId;
+	}
+	
+	public LocalDateTime getDate() {
+	    return timeSlot.getDate();
+	}
+
+	public LocalDateTime getStartTime() {
+	    return timeSlot.getStartTime();
+	}
+
+	public LocalDateTime getEndTime() {
+	    return timeSlot.getEndTime();
 	}
 	
 	public TimeSlot getTimeSlot() {
