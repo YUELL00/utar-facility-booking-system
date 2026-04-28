@@ -64,6 +64,6 @@ public class Facility {
 
 	@Override
 	public String toString() {
-		return String.format("%s - %s (%s) [%s]", facilityId, name, type, status);
+		return String.format("%s - %s (%s) [%s]", facilityId, facilityName, facilityType, location, status);
 	}
 }
