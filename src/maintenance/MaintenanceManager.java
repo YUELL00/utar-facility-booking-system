@@ -2,6 +2,7 @@ package maintenance;
 
 import java.time.*;
 import java.util.*;
+import java.time.LocalDate;
 
 import storage.MaintenanceStorage;
 
@@ -29,11 +30,10 @@ public class MaintenanceManager {
 		String reportId = "R" + (size + 1);
 		String userId = "U001";
 		
-		//get the current date
-		String reportDate = LocalDate.now().toString();
+		LocalDate reportDate = LocalDate.now();
 		
-		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, "NULL", 
-									description, reportDate, "NULL", "NULL", "PENDING", "LOW");
+		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, null, 
+									description, reportDate, null, null, "PENDING", "LOW");
 		reports.add(report);
 		size++;
 	}

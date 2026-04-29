@@ -65,7 +65,7 @@ public class BookingManager{
 		String purpose = input.nextLine();
 		
 		//status
-		String status = "Pending";
+		String status = "PENDING";
 		
 		//createdTime
 		LocalDateTime createdTime = LocalDateTime.now();

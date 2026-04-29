@@ -24,19 +24,12 @@ public class TimeSlot {
 	// check overlap
 	public boolean overlaps(TimeSlot timeSlot) {
 		
-		//take today date
-		LocalDate now = LocalDate.now();
-		
-		if (timeSlot == null) {
-			return true;
-		}
-		else if( timeSlot.getDate().isBefore(now) || ! timeSlot.getStartTime().isBefore(timeSlot.getEndTime()) ) {
-			System.out.println("Invalid Time Slot");
-			return true;
-		}
-		else {
+		if (timeSlot == null) 
 			return false;
-		}
+		
+		return this.date.equals(timeSlot.date) &&
+			       this.startTime.isBefore(timeSlot.endTime) &&
+			       timeSlot.startTime.isBefore(this.endTime);
 
 	}
 

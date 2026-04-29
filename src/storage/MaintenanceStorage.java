@@ -2,6 +2,7 @@ package storage;
 
 import java.io.*;
 import java.util.*;
+import java.time.LocalDate;
 
 import maintenance.MaintenanceReport;
 
@@ -30,9 +31,13 @@ public class MaintenanceStorage extends BaseStorage{
 				String reportedBy=p[2];
 				String assignedTo=p[3];
 				String description=p[4];
-				String reportDate=p[5];
-				String startDate=p[6];
-				String endDate=p[7];
+				LocalDate reportDate = LocalDate.parse(p[5]);
+				LocalDate startDate = p[6].equals("NULL") || p[6].isEmpty()
+						? null
+						: LocalDate.parse(p[6]);
+				LocalDate endDate = p[7].equals("NULL") || p[7].isEmpty()
+						? null
+						: LocalDate.parse(p[7]);
 				String status=p[8];
 				String priority=p[9];
 				
@@ -64,8 +69,8 @@ public class MaintenanceStorage extends BaseStorage{
 				r.getAssignedByUserId()+","+
 				r.getDescription()+","+
 				r.getReportDate()+","+
-				r.getStartDate()+","+
-				r.getEndDate()+","+
+				(r.getStartDate() == null ? "NULL" : r.getStartDate()) + ","+
+				(r.getEndDate() == null ? "NULL" : r.getEndDate()) + ","+
 				r.getStatus()+","+
 				r.getPriority();
 				
