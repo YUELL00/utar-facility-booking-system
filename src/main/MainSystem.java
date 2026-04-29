@@ -241,11 +241,11 @@ public class MainSystem {
 				break;
 			
 				case 2:
-				System.out.println(bookingManager.generatePeakBookingReport());
+				bookingManager.generatePeakBookingReport();
 				break;
 			
 				case 3:
-				System.out.println(maintenanceManager.generateMaintenanceReport());
+				maintenanceManager.generateMaintenanceReport();
 				break;
 			
 				case 0:

@@ -26,9 +26,6 @@ public class BookingManager{
 		
 		this.bookingStorage = new BookingStorage("D:\\BookingStorage.txt");
 		this.facilityStorage = new FacilityStorage("D:\\FacilityStorage.txt");
-		
-		loadBookings();
-		loadFacilities();
 	}
 	
 	//current userId
