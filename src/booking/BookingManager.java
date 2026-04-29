@@ -1,43 +1,48 @@
 package booking;
 
 import java.util.*;
-
-//get current/now date + time
-import java.time.*;
+import java.time.*;//get current/now date + time
+import user.User;
+import facility.Facility;
+import storage.*;
 
 public class BookingManager{
 	
 	Scanner input = new Scanner(System.in);
 
-	private List<Booking> bookings;
+	private ArrayList<Booking> bookings;
 	
-	private List<Facility> facilities;
+	private ArrayList<Facility> facilities;
 	
 	private BookingStorage bookingStorage;
 	
+	private FacilityStorage facilityStorage;
+	
 	//constructor
-	public BookingManager(BookingStorage bookingStorage) {
+	public BookingManager() {
 		
 		this.bookings = new ArrayList<>();
 		this.facilities = new ArrayList<>();
 		
-		this.bookingStorage = bookingStorage;
+		this.bookingStorage = new BookingStorage("D:\\BookingStorage.txt");
+		this.facilityStorage = new FacilityStorage("D:\\FacilityStorage.txt");
 		
 		loadBookings();
-		
 		loadFacilities();
 	}
 	
+	//current userId
+	private User currentUser;
 	
-	public void createBooking(Booking b) {
+	public void setCurrentUser(User user) {
+		this.currentUser = user;
+	}
+	String currentUserId = currentUser.getUserId();
 	
-		/* 写完才发现应该放在main的 (过后删掉)
+	public void createBooking() {
 		
 		//bookingId, output: BXXX , 3int , not enough = fill with 0
 		String bookingId = String.format("B%03d", bookings.size());
-		
-		//current userId
-		String userId = userManager.getCurrentUser().getUserId();
 		
 		//facilityId
 		System.out.print("\nEnter facilityId(Ex:F001): ");
@@ -71,10 +76,10 @@ public class BookingManager{
 		//lastModifiedTime
 		LocalDateTime lastModifiedTime = LocalDateTime.now();
 		
-		Booking booking = new Booking(bookingId, userId, facilityId, timeSlot, 
+		Booking b = new Booking(bookingId, currentUserId, facilityId, timeSlot, 
 					purpose, status, createdTime, lastModifiedTime);
-		*/
-		//List<Booking> bookings
+		
+		//ArrayList<Booking> bookings
 		if( checkConflict(null, b.getFacilityId(), b.getTimeSlot()) ) {
 			
 			bookings.add(b);
@@ -88,9 +93,8 @@ public class BookingManager{
 		}
 	}
 	
-	public void modifyBooking(String bookingId, TimeSlot timeSlot, String purpose) {
+	public void modifyBooking() {
 		
-		/* main
 		//bookingId
 		System.out.print("\nEnter bookingId(Ex:B001): ");
 		String bookingId = input.nextLine();
@@ -114,14 +118,9 @@ public class BookingManager{
 		System.out.print("\nEnter new purpose(academic/co-curricular/official): ");
 		String purpose = input.nextLine();
 		
-		*/
-		
-		//current userId
-		String userId = userManager.getCurrentUser().getUserId();
-		
 		boolean found = false;
 		
-		//List<Booking> bookings
+		//ArrayList<Booking> bookings
 		//Booking b = bookings.get(i);
 		//b.modifyBooking(...) can actually modify object in bookings
 		for(Booking b : bookings) {
@@ -130,7 +129,7 @@ public class BookingManager{
 				
 				found = true;
 				
-				if(!b.getUserId().equals(userId)) {
+				if(!b.getUserId().equals(currentUserId)) {
 					System.out.println("No Privileges to Modify");
 					break;
 				}
@@ -165,16 +164,11 @@ public class BookingManager{
 		
 	}
 	
-	public void cancelBooking(String bookingId) {
+	public void cancelBooking() {
 		
-		/* main
 		//bookingId
 		System.out.print("\nEnter bookingId(Ex:B001): ");
 		String bookingId = input.nextLine();
-		*/
-		
-		//current userId
-		String userId = userManager.getCurrentUser().getUserId();
 		
 		boolean found = false;
 		
@@ -186,7 +180,7 @@ public class BookingManager{
 				
 				found = true;
 				
-				if(!b.getUserId().equals(userId)) {
+				if(!b.getUserId().equals(currentUserId)) {
 					System.out.println("No Privileges to Cancel");
 					break;
 				}
@@ -213,13 +207,11 @@ public class BookingManager{
 		
 	}
 	
-	public String getStatusByBookingId(String bookingId) {
+	public String getStatusByBookingId() {
 		
-		/* main
 		//bookingId
 		System.out.print("\nEnter bookingId(Ex:B001): ");
 		String bookingId = input.nextLine();
-		*/
 		
 		for(Booking b : bookings) {
 			
@@ -234,15 +226,13 @@ public class BookingManager{
 		return "False bookingId";
 	}
 	
-	public List<Booking> getBookingsByUserId(String userId){
+	public ArrayList<Booking> getBookingsByUserId(){
 	
-		/* main
 		//userId
 		System.out.print("\nEnter userId(Ex:U001): ");
 		String userId = input.nextLine();
-		*/
 		
-		List<Booking> result = new ArrayList<>();
+		ArrayList<Booking> result = new ArrayList<>();
 		
 		for(Booking b : bookings) {
 			
@@ -306,13 +296,7 @@ public class BookingManager{
 	
 	
 	public boolean checkConflict(String bookingId, String facilityId, TimeSlot timeSlot) {
-		
-		//avoid 12:00 ~ 10:00 / 12:00 ~ 12:00
-		if( ! timeSlot.getStartTime().isBefore(timeSlot.getEndTime()) ) {
-			System.out.println("Invalid Time Slot");
-			return false;
-		}
-		
+
 		boolean found = false;
 		
 		//check the input facilityId in the storage or not
@@ -334,24 +318,16 @@ public class BookingManager{
 		for(Booking b : bookings) {
 			
 			//skip when modify, 
-			//because new time maybe will conflict the old(will be replace)
+			//because new time maybe will conflict the old(actually will be replace)
 			if(bookingId != null && !bookingId.isEmpty() && 
 					b.getBookingId().equals(bookingId)) {
 				continue;	//= skip
 			}
 				
 			if(b.getFacilityId().equals(facilityId)) {
-					
-				//same date
-				if( (b.getTimeSlot().getDate()).equals(timeSlot.getDate()) ) {
-						
-					//new start time is before existing end time && new end time is after existing start time
-					if( timeSlot.getStartTime().isBefore(b.getTimeSlot().getEndTime()) && 
-							timeSlot.getEndTime().isAfter(b.getTimeSlot().getStartTime()) ) {
-							
-						System.out.println("Time Conflict");
-						return false;
-					}
+				
+				if(timeSlot.overlaps(timeSlot)) {
+					return false;
 				}
 			}
 		}
@@ -361,10 +337,9 @@ public class BookingManager{
 		
 	}
 	
-	
-	public List<Booking> getUpcomingBookings(){
+	public ArrayList<Booking> getUpcomingBookings(){
 		
-		List<Booking> result = new ArrayList<>();
+		ArrayList<Booking> result = new ArrayList<>();
 		
 		LocalDateTime now = LocalDateTime.now();
 		
@@ -468,50 +443,23 @@ public class BookingManager{
 	
 	public void loadFacilities() {
 		
-		//create object to call load()
-		FacilityStorage f = new FacilityStorage("D:\\FacilityStorage.txt");
-		
-		int[] countF = new int[1];
-		
-		Facility[] listF = f.load(countF);
-		
 		facilities.clear();
 		
-		for(int i = 0; i < countF[0]; i++) {
-			facilities.add(listF[i]);
-		}
+		facilities = facilityStorage.load();
+		
 	}
-	
-	
+
 	public void loadBookings() {
-		
-		int[] countB = new int[1];
-		
-		//array <-- file
-		Booking[] listB = bookingStorage.load(countB);
 		
 		bookings.clear();
 		
-		//List<Booking> bookings
-		//list <-- array
-		for(int i = 0; i < countB[0]; i++) {
-			bookings.add(listB[i]);
-		}
-	}
+		bookings = bookingStorage.load();
 	
+	}
+
 	public void saveBookings() {
 		
-		//new array
-		Booking[] arr = new Booking[bookings.size()];
-		
-		//List<Booking> bookings
-		//array <-- list
-		for(int i = 0; i < bookings.size(); i++) {
-			arr[i] = bookings.get(i);
-		}
-		
-		//save array to txt(because file storage is array)
-		bookingStorage.save(arr, bookings.size());
+		bookingStorage.save(bookings);
 	}
 	
 }

@@ -18,25 +18,37 @@ public class TimeSlot {
 
 		if (!startTime.isBefore(endTime)) {
 			throw new IllegalArgumentException("Start time must be before end time");
-			}
 		}
-
-	    // check overlap
-	public boolean overlaps(TimeSlot other) {
-		if (other == null) return false;
-
-		return date.equals(other.date) && 
-				startTime.isBefore(other.endTime) &&
-				endTime.isAfter(other.startTime);
-		}
-
-	    // getters
-	public LocalDate getDate() { return date; }
-	public LocalTime getStartTime() { return startTime; }
-	public LocalTime getEndTime() { return endTime; }
-
-	@Override
-	public String toString() {
-		return "[" + date + " | " + startTime + "-" + endTime + "]";
 	}
+
+	// check overlap
+	public boolean overlaps(TimeSlot timeSlot) {
+		
+		//take today date
+		LocalDate now = LocalDate.now();
+		
+		if (timeSlot == null) {
+			return true;
+		}
+		else if( timeSlot.getDate().isBefore(now) || ! timeSlot.getStartTime().isBefore(timeSlot.getEndTime()) ) {
+			System.out.println("Invalid Time Slot");
+			return true;
+		}
+		else {
+			return false;
+		}
+
+	}
+
+	// getters
+	public LocalDate getDate() { 
+		return date; 
+	}
+	public LocalTime getStartTime() { 
+		return startTime; 
+	}
+	public LocalTime getEndTime() { 
+		return endTime; 
+	}
+
 }

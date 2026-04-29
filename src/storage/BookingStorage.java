@@ -2,10 +2,9 @@ package storage;
 
 import java.io.*;
 import java.util.*;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 import booking.Booking;
 import booking.TimeSlot;
@@ -58,7 +57,7 @@ public class BookingStorage extends BaseStorage{
 				}
 
                 // Composition
-				TimeSlot slot = new TimeSlot(date, startTime, endTime);
+				TimeSlot slot = new TimeSlot(LocalDate.parse(date), LocalTime.parse(startTime), LocalTime.parse(endTime));
                 // Object Creation
 				Booking booking = new Booking(bookingId, userId, facilityId,
 						slot, purpose, status, createdTime, lastModifiedTime);

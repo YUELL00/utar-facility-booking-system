@@ -6,6 +6,7 @@ import user.*;
 import facility.*;
 import booking.*;
 import maintenance.*;
+import storage.BookingStorage;
 import util.*;
 
 public class MainSystem {
@@ -15,7 +16,7 @@ public class MainSystem {
 	private BookingManager bookingManager;
 	private MaintenanceManager maintenanceManager;
 	private NotificationService notificationService;
-
+	
 	protected User currentUser;
 
 	private Scanner scanner;
@@ -60,6 +61,10 @@ public class MainSystem {
 		
 			if (user != null) {
 				currentUser = user;
+				
+				//booking.getCurrentUser
+				bookingManager.setCurrentUser(user);
+				
 				System.out.println("Login successful.");
 				break;
 			} else {
@@ -178,18 +183,17 @@ public class MainSystem {
 			case 1:
 			// 简化：只调用 manager
 			System.out.println("Creating booking...");
+			bookingManager.createBooking();
 			break;
 		
 			case 2:
-			System.out.print("Booking ID: ");
-			String modifyId = scanner.nextLine();
-			bookingManager.modifyBooking(modifyId, null);
+			System.out.println("Modify Booking...");
+			bookingManager.modifyBooking();
 			break;
 		
 			case 3:
-			System.out.print("Booking ID: ");
-			String cancelId = scanner.nextLine();
-			bookingManager.cancelBooking(cancelId);
+			System.out.println("Cancel Booking...");
+			bookingManager.cancelBooking();
 			break;
 		
 			default:

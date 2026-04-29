@@ -17,12 +17,12 @@ public class Facility {
 		this.facilityName = Objects.requireNonNull(facilityName, "Name cannot be empty");
 		this.facilityType = Objects.requireNonNull(facilityType, "Type cannot be empty");
 		setStatus(status); // use same method to check
-		}
+	}
 	
 	// check availability
 	public boolean checkAvailability() {
 		return "Available".equalsIgnoreCase(status);
-		}
+	}
 	
 	// Updates the facility status with validation
 	public void updateStatus(String status) {
