@@ -1,42 +1,52 @@
 package maintenance;
 
 public class MaintenanceReport {
+	
 	private String reportId;
 	public String getReportId() {
 		return reportId;
 	}
+	
 	private String facilityId;
 	public String getFacilityId() {
 		return facilityId;
 	}
+	
 	private String reportedByUserId;
 	public String getReportedByUserId() {
 		return reportedByUserId;
 	}
+	
 	private String assignedByUserId;
-	private String getAssignedByUserId() {
+	public String getAssignedByUserId() {
 		return assignedByUserId;
 	}
+	
 	private String description;
 	public String getDescription() {
 		return description;
 	}
+	
 	private String reportDate;
 	public String getReportDate() {
 		return reportDate;
 	}
+	
 	private String startDate;
 	public String getStartDate() {
 		return startDate;
 	}
+	
 	private String endDate;
 	public String getEndDate() {
 		return endDate;
 	}
+	
 	private String status;
 	public String getStatus() {
 		return status;
 	}
+	
 	private String priority;
 	public String getPriority() {
 		return priority;
@@ -59,14 +69,18 @@ public class MaintenanceReport {
 	public void updateTaskStatus(String status) {
 		this.status = status;
 	}
+	
 	public void assignTo(String userId) {
 		//WIP
+		this.assignedByUserId = userId;
 	}
+	
 	public boolean isCompleted() { //WIP 
-		if(status == "COMPLETED") {
+		if("COMPLETED".equals(status)) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
+	
 }

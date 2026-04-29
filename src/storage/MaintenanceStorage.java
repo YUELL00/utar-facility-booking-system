@@ -12,7 +12,7 @@ public class MaintenanceStorage extends BaseStorage{
 	}
 	
 	public ArrayList<MaintenanceReport> load(){
-		ArrayList<MaintenanceReport> list = new MaintenanceReport<>();
+		ArrayList<MaintenanceReport> list = new ArrayList<>();
 		
 		try{
 			Scanner sc = new Scanner(new File(filePath));
@@ -53,7 +53,7 @@ public class MaintenanceStorage extends BaseStorage{
 	
 	public void save(ArrayList<MaintenanceReport> list){
 		try{
-			PrintWriter writer=new PrintWriter(filePath);
+			PrintWriter writer = new PrintWriter(filePath);
 			
 			for(MaintenanceReport r : list){
 
@@ -61,7 +61,7 @@ public class MaintenanceStorage extends BaseStorage{
 				String line = r.getReportId()+","+
 				r.getFacilityId()+","+
 				r.getReportedByUserId()+","+
-				r.getAssignedToUserId()+","+
+				r.getAssignedByUserId()+","+
 				r.getDescription()+","+
 				r.getReportDate()+","+
 				r.getStartDate()+","+
