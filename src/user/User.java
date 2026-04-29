@@ -52,4 +52,8 @@ public abstract class User {
 				"\nRole: " + getRole();
 	}
 	
+	public void viewProfile() {
+		System.out.println(getProfileInfo());
+	}
+	
 }
