@@ -1,5 +1,7 @@
 package maintenance;
 
+import java.time.LocalDate;
+
 public class MaintenanceReport {
 	
 	private String reportId;
@@ -27,18 +29,18 @@ public class MaintenanceReport {
 		return description;
 	}
 	
-	private String reportDate;
-	public String getReportDate() {
+	private LocalDate reportDate;
+	public LocalDate getReportDate() {
 		return reportDate;
 	}
 	
-	private String startDate;
-	public String getStartDate() {
+	private LocalDate startDate;
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 	
-	private String endDate;
-	public String getEndDate() {
+	private LocalDate endDate;
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 	
@@ -53,7 +55,8 @@ public class MaintenanceReport {
 	}
 	
 	//constructor
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status, String priority) {
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, 
+			String description, LocalDate reportDate, LocalDate startDate, LocalDate endDate, String status, String priority) {
 		this.reportId = reportId;
 		this.facilityId = facilityId;
 		this.reportedByUserId = reportedByUserId;
