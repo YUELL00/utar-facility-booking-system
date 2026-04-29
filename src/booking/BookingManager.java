@@ -35,9 +35,10 @@ public class BookingManager{
 	public void setCurrentUser(User user) {
 		this.currentUser = user;
 	}
-	String currentUserId = currentUser.getUserId();
 	
 	public void createBooking() {
+		
+		String currentUserId = currentUser.getUserId();
 		
 		//bookingId, output: BXXX , 3int , not enough = fill with 0
 		String bookingId = String.format("B%03d", bookings.size());
@@ -92,6 +93,8 @@ public class BookingManager{
 	}
 	
 	public void modifyBooking() {
+		
+		String currentUserId = currentUser.getUserId();
 		
 		//bookingId
 		System.out.print("\nEnter bookingId(Ex:B001): ");
@@ -163,6 +166,8 @@ public class BookingManager{
 	}
 	
 	public void cancelBooking() {
+		
+		String currentUserId = currentUser.getUserId();
 		
 		//bookingId
 		System.out.print("\nEnter bookingId(Ex:B001): ");
@@ -324,7 +329,7 @@ public class BookingManager{
 				
 			if(b.getFacilityId().equals(facilityId)) {
 				
-				if(timeSlot.overlaps(timeSlot)) {
+				if(b.getTimeSlot().overlaps(timeSlot)) {
 					return false;
 				}
 			}
