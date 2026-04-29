@@ -44,11 +44,13 @@ public class TimeSlot {
 	public LocalDate getDate() { 
 		return date; 
 	}
+	
 	public LocalTime getStartTime() { 
 		return startTime; 
 	}
+	
 	public LocalTime getEndTime() { 
 		return endTime; 
 	}
-
+	
 }

@@ -181,7 +181,7 @@ public class MainSystem {
 		switch (choice) {
 	
 			case 1:
-			// 简化：只调用 manager
+			// 简化：只调用 manager 
 			System.out.println("Creating booking...");
 			bookingManager.createBooking();
 			break;

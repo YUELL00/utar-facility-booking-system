@@ -80,8 +80,7 @@ public class Booking {
 	public TimeSlot getTimeSlot() {
 		return timeSlot;
 	}
-	
-	//seem not use
+ 
 	public String getPurpose() {
 		return purpose;
 	}
