@@ -1,7 +1,7 @@
 package facility;
 
 import java.util.*;
-import booking.TimeSlot;
+import storage.FacilityStorage;
 
 public class FacilityManager {
 	private List<Facility> facilities;
@@ -10,23 +10,21 @@ public class FacilityManager {
 	public FacilityManager() {
 		facilities = new ArrayList<>();
 		facilityStorage = new FacilityStorage("facilities.txt");
-		loadFacilities();
 		}
 	
 	// load facilities
 	public void loadFacilities() {
-		Facility[] list = facilityStorage.load();
+		List<Facility> list = facilityStorage.load();
 		
 		facilities.clear();
 		
 		if (list != null) {
-			Collections.addAll(facilities, list);
+			facilities.addAll(list);
 			}
 		}
 	
 	public void saveFacilities() {
-		facilityStorage.save(facilities.toArray(new Facility[0]), facilities.size());
-		
+	    facilityStorage.save(new ArrayList<>(facilities));
 	}
 	
 	// search facility
@@ -38,7 +36,7 @@ public class FacilityManager {
 			
 			// type filter
 			if (type != null && !type.isEmpty() &&
-					!type.equalsIgnoreCase(f.getType())) {
+					!type.equalsIgnoreCase(f.getFacilityType())) {
 				continue;
 				}
 			
