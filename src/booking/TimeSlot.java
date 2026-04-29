@@ -18,25 +18,27 @@ public class TimeSlot {
 
 		if (!startTime.isBefore(endTime)) {
 			throw new IllegalArgumentException("Start time must be before end time");
-			}
 		}
-
-	    // check overlap
-	public boolean overlaps(TimeSlot other) {
-		if (other == null) return false;
-
-		return date.equals(other.date) && 
-				startTime.isBefore(other.endTime) &&
-				endTime.isAfter(other.startTime);
-		}
-
-	    // getters
-	public LocalDate getDate() { return date; }
-	public LocalTime getStartTime() { return startTime; }
-	public LocalTime getEndTime() { return endTime; }
-
-	@Override
-	public String toString() {
-		return "[" + date + " | " + startTime + "-" + endTime + "]";
 	}
+
+	// check overlap
+	public boolean overlaps(TimeSlot timeSlot) {
+		
+		if (timeSlot == null) 
+			return this.date.equals(timeSlot.date) &&
+					this.startTime.isBefore(timeSlot.endTime) &&
+					timeSlot.startTime.isBefore(this.endTime);
+	}
+
+	// getters
+	public LocalDate getDate() { 
+		return date; 
+	}
+	public LocalTime getStartTime() { 
+		return startTime; 
+	}
+	public LocalTime getEndTime() { 
+		return endTime; 
+	}
+
 }
