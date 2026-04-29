@@ -23,9 +23,6 @@ public class BookingManager{
 		
 		this.bookingStorage = bookingStorage;
 		
-		loadBookings();
-		
-		loadFacilities();
 	}
 	
 	
