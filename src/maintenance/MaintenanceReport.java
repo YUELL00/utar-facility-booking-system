@@ -37,13 +37,10 @@ public class MaintenanceReport {
 	public String getStatus() {
 		return status;
 	}
-	private String priority;
-	public String getPriority() {
-		return priority;
-	}
 	
 	//constructor
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status, String priority) {
+	//Maintenance Report
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status) {
 		this.reportId = reportId;
 		this.facilityId = facilityId;
 		this.reportedByUserId = reportedByUserId;
@@ -53,14 +50,28 @@ public class MaintenanceReport {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.status = status;
-		this.priority = priority;
+	}
+	
+	//Feedback
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String description, String reportDate) {
+		this.reportId = reportId;
+		this.facilityId = facilityId;
+		this.reportedByUserId = reportedByUserId;
+		this.description = description;
+		this.reportDate = reportDate;
 	}
 	
 	public void updateTaskStatus(String status) {
 		this.status = status;
 	}
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
 	public void assignTo(String userId) {
-		//WIP
+		this.reportedByUserId = userId;
 	}
 	public boolean isCompleted() { //WIP 
 		if(status == "COMPLETED") {
