@@ -12,7 +12,6 @@ public class UserManager {
 	public UserManager(){
 		userStorage = new UserStorage("users.txt");
 		users = new ArrayList<>();
-		loadUsers();
 	}
 	
 	public void registerUser(User user){

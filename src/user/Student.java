@@ -16,7 +16,12 @@ public class Student extends User{
 	
 	@Override
 	public String getRole() {
-		return this.getClass().getSimpleName();
+		return "Student";
+	}
+	
+	@Override
+	public String getProfileInfo() {
+		return super.getProfileInfo() + "\nProgramme: " + programme;
 	}
 	
 }
