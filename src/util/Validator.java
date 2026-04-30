@@ -5,14 +5,10 @@ public class Validator {
 	// User Validation
 	
 	public static boolean validateUserId(String userId) {
-		if (userId == null || userId.length() < 2)
+		if (userId == null || userId.length() != 7)
 			return false;
 		
-		char first = userId.charAt(0);
-		if (first != 'U' && first != 'S' && first != 'A') 
-			return false;
-		
-		for (int i = 1; i < 4; i++) {
+		for (int i = 0; i < userId.length(); i++) {
 			if (!Character.isDigit(userId.charAt(i))) 
 				return false;
 		}

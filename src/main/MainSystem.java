@@ -41,9 +41,68 @@ public class MainSystem {
 		System.out.println("=== System Started ===");
 	
 		while (true) {
-			login();
-			handleUserMenu(currentUser);
+			displayWelcomeMenu();
+			int choice = getMenuChoice();
+			
+			switch (choice) {
+				case 1:
+					login();
+					handleUserMenu(currentUser);
+					break;
+					
+				case 2:
+					handleRegister();
+					break;
+					
+				case 0:
+					exitSystem();
+					System.exit(0);
+					break;
+					
+				default:
+					System.out.println("Invalid choice.");
+			}
 		}
+	}
+	
+	// Welcome Menu
+	private void displayWelcomeMenu() {
+		System.out.println("\n=== Welcome ===");
+		System.out.println("1. Login");
+		System.out.println("2. Register");
+		System.out.println("0. Exit");
+	}
+	
+	// Register
+	private void handleRegister() {
+		System.out.println("\n=== Register Account ===");
+		
+		System.out.println("User ID: ");
+		String userID = scanner.nextLine();
+		
+		System.out.println("Password: ");
+		String password = scanner.nextLine();
+		
+		System.out.println("Name: ");
+		String name = scanner.nextLine();
+		
+		System.out.println("Faculty/Department: ");
+		String faculty = scanner.nextLine();
+		
+		System.out.println("Contact Number: ");
+		String contact = scanner.nextLine();
+		
+		System.out.println("Role (Student/Staff): ");
+		String role = scanner.nextLine();
+		
+		String programme = null;
+
+		if(role.equalsIgnoreCase("Student")) {
+			System.out.print("Programme: ");
+			programme = scanner.nextLine();
+		}
+		
+		userManager.registerUser(userID, password, name, faculty, contact, role, programme);
 	}
 
 	// Login
@@ -152,6 +211,8 @@ public class MainSystem {
 			}
 		}
 	}
+	
+	
 
 	// Facility
 	private void handleFacilitySearch() {
