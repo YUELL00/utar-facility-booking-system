@@ -45,7 +45,7 @@ public abstract class User {
 	
 	// show the student information
 	public String getProfileInfo(){ 
-		return "User ID: " + userId + 
+		return "\nUser ID: " + userId + 
 				"\nName: " + name + 
 				"\nFaculty/Department: " + facultyOrDepartment + 
 				"\nContact: " + contactNumber + 

@@ -35,6 +35,21 @@ public class BookingManager{
 		this.currentUser = user;
 	}
 	
+	public boolean isBooked(String facilityId, TimeSlot timeSlot) {
+
+		for (Booking b : bookings) {
+
+			if (b.getFacilityId().equals(facilityId)) {
+
+				if (b.getTimeSlot().overlaps(timeSlot)) {
+					return true;
+					}
+				}
+			}
+
+		return false;
+	}
+	
 	public void createBooking() {
 		
 		String currentUserId = currentUser.getUserId();
