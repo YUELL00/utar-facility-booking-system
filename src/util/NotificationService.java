@@ -19,7 +19,7 @@ public class NotificationService {
 			return "Error: TimeSlot missing.";
 		}
 		
-		return "Reminder: Booking " + b.getBookingId() + "\nFacility: " + b.getFacilityId() +
+		return "\nReminder: \nBooking: " + b.getBookingId() + "\nFacility: " + b.getFacilityId() +
 				"\nDate: " + ts.getDate() + "\nTime: " + ts.getStartTime() + " - " + ts.getEndTime() +
 				"\nPlease be on time.";
 	}

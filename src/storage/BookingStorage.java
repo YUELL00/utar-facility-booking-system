@@ -4,12 +4,15 @@ import java.io.*;
 import java.util.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import booking.*;
 import booking.TimeSlot;
 
 public class BookingStorage extends BaseStorage{
 
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+	
 	public BookingStorage(String filePath) {
     	super(filePath);
     }
@@ -43,14 +46,14 @@ public class BookingStorage extends BaseStorage{
 				
 				// parse createdTime
 				try {
-					createdTime = LocalDateTime.parse(p[8]);
+					createdTime = LocalDateTime.parse(p[8], formatter);
 				} catch (Exception e) {
 					createdTime = null;
 				}
 
 				// parse lastModifiedTime
 				try {
-					lastModifiedTime = LocalDateTime.parse(p[9]);
+					lastModifiedTime = LocalDateTime.parse(p[9], formatter);
 				} catch (Exception e) {
 					lastModifiedTime = null;
 				}
@@ -89,8 +92,8 @@ public class BookingStorage extends BaseStorage{
 							t.getEndTime() + "," +
 							b.getPurpose() + "," +
 							b.getStatus() + "," +
-							b.getCreatedTime() + "," +
-							b.getLastModifiedTime();
+							b.getCreatedTime().format(formatter) + "," +
+							b.getLastModifiedTime().format(formatter);
 
                 writer.println(line);
             }

@@ -32,7 +32,7 @@ public class Booking {
 	}
 
 	public boolean canModify() {
-		if(status.equals("Pending")) {
+		if(status.equals(BookingStatus.PENDING)) {
 			return true;
 		}
 		else {

@@ -36,9 +36,10 @@ public class MainSystem {
 		userManager.loadUsers();
 		facilityManager.loadFacilities();
 		bookingManager.loadBookings();
+		bookingManager.loadFacilities();
 		maintenanceManager.loadReports();
-	
-		System.out.println("=== System Started ===");
+		
+		System.out.println("\n====== System Started ======");
 	
 		while (true) {
 			login();
@@ -74,7 +75,7 @@ public class MainSystem {
 
 	// Main menu
 	public void displayMainMenu() {
-		System.out.println("\n=== Main Menu ===");
+		System.out.println("\n====== Main Menu ======");
 		System.out.println("1. View Profile");
 		System.out.println("2. Facility Search");
 		System.out.println("3. Booking");
@@ -85,7 +86,7 @@ public class MainSystem {
 	}
 
 	public void displayReportsMenu() {
-		System.out.println("\n=== Reports Menu ===");
+		System.out.println("\n====== Reports Menu ======");
 		System.out.println("1. Facility Utilization");
 		System.out.println("2. Peak Booking");
 		System.out.println("3. Maintenance Report");
@@ -156,7 +157,7 @@ public class MainSystem {
 	// Facility
 	private void handleFacilitySearch() {
 
-		System.out.print("Date: ");
+		System.out.print("Enter date(Ex:2026-05-01): ");
 		String date = scanner.nextLine();
 	
 		System.out.print("Time Slot: ");
@@ -171,7 +172,7 @@ public class MainSystem {
 	// Booking
 	private void handleBookingMenu(User user) {
 
-		System.out.println("\n=== Booking Menu ===");
+		System.out.println("\n====== Booking Menu ======");
 		System.out.println("1. Create Booking");
 		System.out.println("2. Modify Booking");
 		System.out.println("3. Cancel Booking");
@@ -237,7 +238,7 @@ public class MainSystem {
 	// Maintenance
 	private void handleMaintenanceMenu() {
 
-		System.out.println("\n=== Maintenance Menu ===");
+		System.out.println("\n====== Maintenance Menu ======");
 		System.out.println("1. Create Report");
 		System.out.println("2. View History");
 		System.out.println("0. Back");
