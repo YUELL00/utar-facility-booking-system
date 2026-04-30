@@ -1,6 +1,10 @@
 package facility;
 
+import java.time.LocalTime;
 import java.util.*;
+
+import booking.BookingManager;
+import booking.TimeSlot;
 import storage.FacilityStorage;
 
 public class FacilityManager {
@@ -28,36 +32,37 @@ public class FacilityManager {
 	}
 	
 	// search facility
-	public List<Facility> searchFacilities(String date, String timeSlot, String type) {
+	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end,
+									String type, BookingManager bookingManager) {
 		
+		// 1. Validate Input
+		if (date == null || date.isEmpty() || start == null || end == null) {
+			throw new IllegalArgumentException("Invalid input");
+		}
+
+		TimeSlot ts = new TimeSlot(java.time.LocalDate.parse(date), start, end);
+
 		List<Facility> result = new ArrayList<>();
-		
+
 		for (Facility f : facilities) {
-			
 			// type filter
-			if (type != null && !type.isEmpty() &&
-					!type.equalsIgnoreCase(f.getFacilityType())) {
+			if (type != null && !type.isEmpty() && !type.equalsIgnoreCase(f.getFacilityType())) {
 				continue;
-				}
-			
-			// availability filter
+			}
+
+			// status filter
 			if (!f.checkAvailability()) {
 				continue;
-				
 			}
-			
-			result.add(f);
-			
-		}
-		
-		// display result
-		if (result.isEmpty()) {
-			System.out.println("No available facilities found.");
-			} else {
-				result.forEach(System.out::println);
-				}
-		return result;
-		}
+
+			// check booking conflict
+			if (bookingManager.isBooked(f.getFacilityId(), ts)) {
+				continue;
+			}
+	        result.add(f);
+	    }
+	    return result;
+	}
 
 	// get all available
 	public List<Facility> getAvailableFacilities() {

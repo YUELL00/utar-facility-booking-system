@@ -41,7 +41,7 @@ public class BookingManager{
 		for (Booking b : bookings) {
 
 			if (b.getFacilityId().equals(facilityId)) {
-	
+
 				if (b.getTimeSlot().overlaps(timeSlot)) {
 					return true;
 				}
