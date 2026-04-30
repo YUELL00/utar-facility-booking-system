@@ -24,8 +24,8 @@ public class BookingManager{
 		this.bookings = new ArrayList<>();
 		this.facilities = new ArrayList<>();
 		
-		this.bookingStorage = new BookingStorage("D:\\BookingStorage.txt");
-		this.facilityStorage = new FacilityStorage("D:\\FacilityStorage.txt");
+		this.bookingStorage = new BookingStorage("booking.txt");
+		this.facilityStorage = new FacilityStorage("facilities.txt");
 	}
 	
 	//current userId
@@ -47,26 +47,41 @@ public class BookingManager{
 		String facilityId = input.nextLine();
 		
 		//timeSlot
-		System.out.print("\nEnter date(Ex:2026-05-01): ");
-		String inputDate = input.nextLine();
-		LocalDate date = LocalDate.parse(inputDate);
+		TimeSlot trueTimeSlot = null;
 		
-		System.out.print("\nEnter start time(Ex:10:00): ");
-		String inputStartTime = input.nextLine();
-		LocalTime startTime = LocalTime.parse(inputStartTime);
-		
-		System.out.print("\nEnter end time(Ex:12:00): ");
-		String inputEndTime = input.nextLine();
-		LocalTime endTime = LocalTime.parse(inputEndTime);
-		
-		TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+		while(true) {
+			System.out.print("\nEnter date(Ex:2026-05-01): ");
+			String inputDate = input.nextLine();
+			LocalDate date = LocalDate.parse(inputDate);
+			
+			System.out.print("\nEnter start time(Ex:10:00): ");
+			String inputStartTime = input.nextLine();
+			LocalTime startTime = LocalTime.parse(inputStartTime);
+			
+			System.out.print("\nEnter end time(Ex:12:00): ");
+			String inputEndTime = input.nextLine();
+			LocalTime endTime = LocalTime.parse(inputEndTime);
+			
+			TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+			
+			if( checkConflict(null, facilityId, timeSlot) ) {
+				
+				//save true timeSlot
+				trueTimeSlot = timeSlot;
+				
+				// no conflict --> exit loop
+				break;
+			}
+			
+			System.out.println("Please Re-enter: ");
+		}	
 		
 		//purpose
 		System.out.print("\nEnter purpose(academic/co-curricular/official): ");
 		String purpose = input.nextLine();
 		
 		//status
-		String status = "PENDING";
+		BookingStatus status = BookingStatus.PENDING;
 		
 		//createdTime
 		LocalDateTime createdTime = LocalDateTime.now();
@@ -74,21 +89,15 @@ public class BookingManager{
 		//lastModifiedTime
 		LocalDateTime lastModifiedTime = LocalDateTime.now();
 		
-		Booking b = new Booking(bookingId, currentUserId, facilityId, timeSlot, 
+		Booking b = new Booking(bookingId, currentUserId, facilityId, trueTimeSlot, 
 					purpose, status, createdTime, lastModifiedTime);
+			
+		bookings.add(b);
+			
+		saveBookings();
+			
+		System.out.println("Booking Created");
 		
-		//ArrayList<Booking> bookings
-		if( checkConflict(null, b.getFacilityId(), b.getTimeSlot()) ) {
-			
-			bookings.add(b);
-			
-			saveBookings();
-			
-			System.out.println("Booking Created");
-		}
-		else{
-			System.out.println("Created Fail");
-		}
 	}
 	
 	public void modifyBooking() {
@@ -115,7 +124,7 @@ public class BookingManager{
 		TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
 		
 		//purpose
-		System.out.print("\nEnter new purpose(academic/co-curricular/official): ");
+		System.out.print("\nEnter new purpose: ");
 		String purpose = input.nextLine();
 		
 		boolean found = false;
@@ -219,7 +228,7 @@ public class BookingManager{
 			
 			if(b.getBookingId().equals(bookingId)) {
 				
-				return "Status: " + b.getStatus();
+				return "Status: " + b.getStatus().toString();
 				
 				//when return occur, (loop + this method) will stop
 			}
@@ -251,8 +260,19 @@ public class BookingManager{
 		return result;
 	}
 	
+	
+	public void showAllBookings() {
+		
+		for(Booking b : bookings) {
+			System.out.println(b);
+		}
+	}
+	
 	//admin only
-	public void approveBooking(String bookingId) {
+	public void approveBooking() {
+		
+		System.out.print("Enter bookingId(Ex:B001): ");
+		String bookingId = input.nextLine();
 		
 		boolean found = false;
 		
@@ -262,7 +282,7 @@ public class BookingManager{
 				
 				found = true;
 				
-				b.setStatus("APPROVED");
+				b.setStatus(BookingStatus.APPROVED);
 				saveBookings();
 				System.out.println("Booking Approved");
 				
@@ -275,7 +295,10 @@ public class BookingManager{
 	}
 	
 	//admin only
-	public void rejectBooking(String bookingId) {
+	public void rejectBooking() {
+
+		System.out.print("Enter bookingId(Ex:B001): ");
+		String bookingId = input.nextLine();
 		
 		boolean found = false;
 		
@@ -284,7 +307,7 @@ public class BookingManager{
 				
 				found = true;
 				
-				b.setStatus("REJECTED");
+				b.setStatus(BookingStatus.REJECTED);
 				saveBookings();
 				System.out.println("Booking Rejected");
 				
@@ -329,6 +352,7 @@ public class BookingManager{
 			if(b.getFacilityId().equals(facilityId)) {
 				
 				if(b.getTimeSlot().overlaps(timeSlot)) {
+					System.out.println("Time Conflict");
 					return false;
 				}
 			}
@@ -338,6 +362,7 @@ public class BookingManager{
 		return true;
 		
 	}
+
 	
 	public ArrayList<Booking> getUpcomingBookings(){
 		

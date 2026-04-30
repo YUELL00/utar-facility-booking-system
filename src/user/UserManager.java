@@ -10,8 +10,9 @@ public class UserManager {
 	private UserStorage userStorage;
 	
 	public UserManager(){
-		userStorage = new UserStorage("users.txt");
 		users = new ArrayList<>();
+		
+		userStorage = new UserStorage("users.txt");
 	}
 	
 	public void registerUser(User user){

@@ -5,7 +5,7 @@ import java.util.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
-import booking.Booking;
+import booking.*;
 import booking.TimeSlot;
 
 public class BookingStorage extends BaseStorage{
@@ -37,7 +37,7 @@ public class BookingStorage extends BaseStorage{
 				String startTime = p[4];
 				String endTime = p[5];
 				String purpose = p[6];
-				String status = p[7];
+				BookingStatus status = BookingStatus.valueOf(p[7].toUpperCase());
 				LocalDateTime createdTime;
 				LocalDateTime lastModifiedTime;
 				

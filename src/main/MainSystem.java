@@ -6,7 +6,6 @@ import user.*;
 import facility.*;
 import booking.*;
 import maintenance.*;
-import storage.BookingStorage;
 import util.*;
 
 public class MainSystem {
@@ -97,12 +96,14 @@ public class MainSystem {
 
 		System.out.print("Enter choice: ");
 		String input = scanner.nextLine();
-	
-		if (!Validator.validateUserId(input)) {
+		
+		try {
+			return Integer.parseInt(input);
+		}
+		catch(Exception e) {
 			return -1;
 		}
 
-		return Integer.parseInt(input);
 	}
 
 	// User menu handler
@@ -126,7 +127,7 @@ public class MainSystem {
 				break;
 			
 				case 3:
-				handleBookingMenu();
+				handleBookingMenu(user);
 				break;
 			
 				case 4:
@@ -168,12 +169,17 @@ public class MainSystem {
 	}
 
 	// Booking
-	private void handleBookingMenu() {
+	private void handleBookingMenu(User user) {
 
 		System.out.println("\n=== Booking Menu ===");
 		System.out.println("1. Create Booking");
 		System.out.println("2. Modify Booking");
 		System.out.println("3. Cancel Booking");
+		if(user.getRole().equalsIgnoreCase("Admin")) {
+			System.out.println("4. Show All Bookings");
+			System.out.println("5. Approve Booking");
+			System.out.println("6. Reject Booking");
+		}
 		System.out.println("0. Back");
 	
 		int choice = getMenuChoice();
@@ -182,20 +188,47 @@ public class MainSystem {
 	
 			case 1:
 			// 简化：只调用 manager 
-			System.out.println("Creating booking...");
+			System.out.println("\nCreating booking...");
 			bookingManager.createBooking();
 			break;
 		
 			case 2:
-			System.out.println("Modify Booking...");
+			System.out.println("\nModify Booking...");
 			bookingManager.modifyBooking();
 			break;
 		
 			case 3:
-			System.out.println("Cancel Booking...");
+			System.out.println("\nCancel Booking...");
 			bookingManager.cancelBooking();
 			break;
-		
+			
+			case 4:
+			if(user.getRole().equalsIgnoreCase("Admin")) {
+				System.out.println("\nShow All Bookings...");
+				bookingManager.showAllBookings();
+			}
+			else {
+				break;
+			}
+			
+			case 5:
+			if(user.getRole().equalsIgnoreCase("Admin")) {
+				System.out.println("\nApprove Booking...");
+				bookingManager.approveBooking();;
+				}
+			else {
+				break;
+			}
+				
+			case 6:
+			if(user.getRole().equalsIgnoreCase("Admin")) {
+				System.out.println("\nReject Booking...");
+				bookingManager.rejectBooking();;
+			}
+			else {
+				break;
+			}
+				
 			default:
 			break;
 		}
