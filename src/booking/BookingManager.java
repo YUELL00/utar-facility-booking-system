@@ -83,6 +83,7 @@ public class BookingManager{
 		
 		while(true) {
 			
+			//check date
 			while(true) {
 				System.out.print("\nEnter date(Ex:2026-05-01): ");
 				String inputDate = input.nextLine();
@@ -104,6 +105,7 @@ public class BookingManager{
 				}
 			}
 			
+			//check start time
 			while(true) {
 				System.out.print("\nEnter start time(Ex:10:00): ");
 				String inputStartTime = input.nextLine();
@@ -111,7 +113,9 @@ public class BookingManager{
 				try {
 					startTime = LocalTime.parse(inputStartTime);
 					
-					if(startTime.isBefore(LocalTime.now())) {
+					LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+					
+					if(startDateTime.isBefore(LocalDateTime.now())) {
 						System.out.println("\nInvalid Time! (Past)");
 						System.out.println("Please Re-enter: ");
 						continue;
@@ -124,6 +128,7 @@ public class BookingManager{
 				}
 			}
 			
+			//check end time
 			while(true) {			
 				System.out.print("\nEnter end time(Ex:12:00): ");
 				String inputEndTime = input.nextLine();
@@ -131,7 +136,9 @@ public class BookingManager{
 				try {
 					endTime = LocalTime.parse(inputEndTime);
 					
-					if(endTime.isBefore(LocalTime.now())) {
+					LocalDateTime endDateTime = LocalDateTime.of(date, endTime);
+					
+					if(endDateTime.isBefore(LocalDateTime.now())) {
 						System.out.println("\nInvalid Time! (Past)");
 						System.out.println("Please Re-enter: ");
 						continue;
@@ -202,6 +209,7 @@ public class BookingManager{
 		
 		while(true) {
 			boolean found = false;
+			boolean privilege = false;
 			
 			System.out.print("\nEnter bookingId(Ex:B001): ");
 			String bookingId = input.nextLine();
@@ -212,24 +220,31 @@ public class BookingManager{
 				
 					if(b.getBookingId().equals(bookingId)) {
 			
+						found = true;
+						
 						if(!b.getUserId().equals(currentUserId)) {
 							System.out.println("\nNo Privileges to Modify!");
-							found = false;
 							break;
 						}
 						else {
-							found = true;
+							privilege = true;
 						}
-	
+						
 						if(!b.canModify()) {
 							System.out.println("\nCannot Modify!");
-							found = false;
+							privilege = false;
 							break;
 						}
 						else {
-							found = true;
+							privilege = true;
 						}
+						
+						break;
 					}
+				}
+				
+				if(!privilege) {
+					return;	// stop this whole method
 				}
 				
 				if(found) {
@@ -238,7 +253,7 @@ public class BookingManager{
 				}		
 				else {
 					System.out.println("\nFalse bookingId!");
-				}
+				}			
 			}
 			System.out.println("Please Re-enter: ");
 		
@@ -253,8 +268,9 @@ public class BookingManager{
 		
 		while(true) {
 			
+			//check date
 			while(true) {
-				System.out.print("\nEnter date(Ex:2026-05-02): ");
+				System.out.print("\nEnter new date(Ex:2026-05-02): ");
 				String inputDate = input.nextLine();
 				
 				try {
@@ -274,14 +290,17 @@ public class BookingManager{
 				}
 			}
 			
+			//check start time
 			while(true) {
-				System.out.print("\nEnter start time(Ex:13:00): ");
+				System.out.print("\nEnter new start time(Ex:13:00): ");
 				String inputStartTime = input.nextLine();
 				
 				try {
 					startTime = LocalTime.parse(inputStartTime);
 					
-					if(startTime.isBefore(LocalTime.now())) {
+					LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+					
+					if(startDateTime.isBefore(LocalDateTime.now())) {
 						System.out.println("\nInvalid Time! (Past)");
 						System.out.println("Please Re-enter: ");
 						continue;
@@ -294,14 +313,17 @@ public class BookingManager{
 				}
 			}
 			
+			//check end time
 			while(true) {			
-				System.out.print("\nEnter end time(Ex:15:00): ");
+				System.out.print("\nEnter new end time(Ex:15:00): ");
 				String inputEndTime = input.nextLine();
 				
 				try {
 					endTime = LocalTime.parse(inputEndTime);
 					
-					if(endTime.isBefore(LocalTime.now())) {
+					LocalDateTime endDateTime = LocalDateTime.of(date, endTime);
+					
+					if(endDateTime.isBefore(LocalDateTime.now())) {
 						System.out.println("\nInvalid Time! (Past)");
 						System.out.println("Please Re-enter: ");
 						continue;
