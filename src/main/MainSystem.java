@@ -38,9 +38,10 @@ public class MainSystem {
 		userManager.loadUsers();
 		facilityManager.loadFacilities();
 		bookingManager.loadBookings();
+		bookingManager.loadFacilities();
 		maintenanceManager.loadReports();
-	
-		System.out.println("=== System Started ===");
+		
+		System.out.println("======== System Started ========");
 	
 		while (true) {
 			displayWelcomeMenu();
@@ -49,6 +50,7 @@ public class MainSystem {
 			switch (choice) {
 				case 1:
 					login();
+					checkUpcomingBookings();
 					handleUserMenu(currentUser);
 					break;
 					
@@ -69,7 +71,8 @@ public class MainSystem {
 	
 	// Welcome Menu
 	private void displayWelcomeMenu() {
-		System.out.println("\n=== Welcome ===");
+
+		System.out.println("\n============ Welcome ===========");
 		System.out.println("1. Login");
 		System.out.println("2. Register");
 		System.out.println("0. Exit");
@@ -77,7 +80,8 @@ public class MainSystem {
 	
 	// Register
 	private void handleRegister() {
-		System.out.println("\n=== Register Account ===");
+
+		System.out.println("\n======= Register Account =======");
 		
 		// ===== User ID =====
 		String userId;
@@ -213,7 +217,8 @@ public class MainSystem {
 
 	// Main menu
 	public void displayMainMenu() {
-		System.out.println("\n=== Main Menu ===");
+	
+		System.out.println("\n=========== Main Menu ==========");
 		System.out.println("1. View Profile");
 		System.out.println("2. Facility Search");
 		System.out.println("3. Booking");
@@ -224,7 +229,8 @@ public class MainSystem {
 	}
 
 	public void displayReportsMenu() {
-		System.out.println("\n=== Reports Menu ===");
+
+		System.out.println("\n========= Reports Menu =========");
 		System.out.println("1. Facility Utilization");
 		System.out.println("2. Peak Booking");
 		System.out.println("3. Maintenance Report");
@@ -250,8 +256,6 @@ public class MainSystem {
 
 		while (true) {
 	
-			checkUpcomingBookings();
-		
 			displayMainMenu();
 			int choice = getMenuChoice();
 		
@@ -321,73 +325,86 @@ public class MainSystem {
 	// Booking
 	private void handleBookingMenu(User user) {
 
-		System.out.println("\n=== Booking Menu ===");
-		System.out.println("1. Create Booking");
-		System.out.println("2. Modify Booking");
-		System.out.println("3. Cancel Booking");
-		if(user.getRole().equalsIgnoreCase("Admin")) {
-			System.out.println("4. Show All Bookings");
-			System.out.println("5. Approve Booking");
-			System.out.println("6. Reject Booking");
-		}
-		System.out.println("0. Back");
-	
-		int choice = getMenuChoice();
-	
-		switch (choice) {
-	
-			case 1:
-			// 简化：只调用 manager 
-			System.out.println("\nCreating booking...");
-			bookingManager.createBooking();
-			break;
+		while(true) {
 		
-			case 2:
-			System.out.println("\nModify Booking...");
-			bookingManager.modifyBooking();
-			break;
+			System.out.println("\n========= Booking Menu =========");
+			System.out.println("1. Create Booking");
+			System.out.println("2. Modify Booking");
+			System.out.println("3. Cancel Booking");
+			
+			//check admin role
+			if(user.getRole().equalsIgnoreCase("Admin")) {
+				
+				System.out.println("4. Show All Bookings");
+				System.out.println("5. Approve Booking");
+				System.out.println("6. Reject Booking");
+			}
+			System.out.println("0. Back");
 		
-			case 3:
-			System.out.println("\nCancel Booking...");
-			bookingManager.cancelBooking();
-			break;
+			int choice = getMenuChoice();
+		
+			switch (choice) {
+		
+				case 1:
+					// 简化：只调用 manager 
+					System.out.println("\nCreating booking...");
+					bookingManager.createBooking();
+					break;
 			
-			case 4:
-			if(user.getRole().equalsIgnoreCase("Admin")) {
-				System.out.println("\nShow All Bookings...");
-				bookingManager.showAllBookings();
-			}
-			else {
-				break;
-			}
+				case 2:
+					System.out.println("\nModify Booking...");
+					bookingManager.modifyBooking();
+					break;
 			
-			case 5:
-			if(user.getRole().equalsIgnoreCase("Admin")) {
-				System.out.println("\nApprove Booking...");
-				bookingManager.approveBooking();;
-				}
-			else {
-				break;
-			}
+				case 3:
+					System.out.println("\nCancel Booking...");
+					bookingManager.cancelBooking();
+					break;
 				
-			case 6:
-			if(user.getRole().equalsIgnoreCase("Admin")) {
-				System.out.println("\nReject Booking...");
-				bookingManager.rejectBooking();;
-			}
-			else {
-				break;
-			}
+				case 4:
+					if(user.getRole().equalsIgnoreCase("Admin")) {
+						System.out.println("\nShow All Bookings...\n");
+						bookingManager.showAllBookings();
+						break;
+					}
+					else {
+						break;
+					}
 				
-			default:
-			break;
+				case 5:
+					if(user.getRole().equalsIgnoreCase("Admin")) {
+						System.out.println("\nApprove Booking...");
+						bookingManager.approveBooking();
+						break;
+						}
+					else {
+						break;
+					}
+					
+				case 6:
+					if(user.getRole().equalsIgnoreCase("Admin")) {
+						System.out.println("\nReject Booking...");
+						bookingManager.rejectBooking();
+						break;
+					}
+					else {
+						break;
+					}
+				
+				case 0:
+					return;	//back to main menu
+					
+				default:
+					System.out.println("Invalid Choice!");
+					System.out.println("Please choose again: ");
+			}
 		}
 	}
 
 	// Maintenance
 	private void handleMaintenanceMenu() {
 
-		System.out.println("\n=== Maintenance Menu ===");
+		System.out.println("\n======= Maintenance Menu =======");
 		System.out.println("1. Create Report");
 		System.out.println("2. View History");
 		System.out.println("0. Back");

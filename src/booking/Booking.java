@@ -27,6 +27,20 @@ public class Booking {
 		this.lastModifiedTime = lastModifiedTime;
 	}
 	
+	//print out
+	@Override
+	public String toString() {
+		
+		return "Booking ID: " + bookingId + 
+				"\nUser ID: " + userId + 
+				"\nFacility ID: " + facilityId +
+				"\nDate: " + timeSlot.getDate() + 
+				"\nTime: " + timeSlot.getStartTime() + " - " + timeSlot.getEndTime() + 
+				"\nStatus: " + status + 
+				"\n--------------------";
+		
+	}
+	
 	public void setStatus(BookingStatus status) {
 		this.status = status;
 	}
@@ -46,10 +60,10 @@ public class Booking {
 		LocalDateTime now = LocalDateTime.now();
 		
 		// get booking date + time
-		LocalDateTime start = LocalDateTime.of(timeSlot.getDate(), timeSlot.getStartTime());
+		LocalDateTime end = LocalDateTime.of(timeSlot.getDate(), timeSlot.getEndTime());
 		
-		// now date + time > booking start time
-		if(now.isAfter(start)) {
+		// now date + time > booking end time
+		if(now.isAfter(end)) {
 			return false;
 		}
 		else {

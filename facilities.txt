@@ -1,8 +1,8 @@
-F001,Discussion Room 1,Room,Block A,Available
-F002,Discussion Room 2,Room,Block A,Unavailable
-F003,Lecture Hall 1,Hall,Block C,Available
-F004,Computer Lab 1,Lab,Block B,Available
-F005,Computer Lab 2,Lab,Block B,Unavailable
-F006,Basketball Court,Sports,Outdoor,Available
-F007,Multipurpose Hall,Hall,Block D,Available
-F008,Meeting Room 1,Room,Block E,Available
+F001,Discussion Room 1,Room,null,Available
+F002,Discussion Room 2,Room,null,Unavailable
+F003,Lecture Hall 1,Hall,null,Available
+F004,Computer Lab 1,Lab,null,Available
+F005,Computer Lab 2,Lab,null,Unavailable
+F006,Basketball Court,Sports,null,Available
+F007,Multipurpose Hall,Hall,null,Available
+F008,Meeting Room 1,Room,null,Available
