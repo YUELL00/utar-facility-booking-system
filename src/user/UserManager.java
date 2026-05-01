@@ -15,56 +15,73 @@ public class UserManager {
 		loadUsers();
 	}
 	
-	public void registerUser(String userId, String password, String name,
+	public String validateUserId(String userId) {
+		if (!Validator.validateUserId(userId)) {
+			return "Invalid User ID format.";
+		}
+		
+		if (getUserById(userId) != null) {
+			return "User ID already exists.";
+		}
+		
+		return null;
+	}
+	
+	public String validatePassword(String password) {
+		if (!Validator.validatePassword(password)) {
+			return "Password must be at least 6 characters.";
+			}
+		return null;
+	}
+	
+	public String validateContact(String contact) {
+		if (!Validator.validateContactNumber(contact)) {
+			return "Invalid contact number.";
+		}
+		return null;
+	}
+	
+	public String validateRole(String role) {
+		if (!(role.equalsIgnoreCase("Student") || role.equalsIgnoreCase("Staff"))) {
+			return "Invalid role.";
+		}
+		return null;
+	}
+	
+	public String validateProgramme(String role, String programme) {
+		if (role.equalsIgnoreCase("Student")) {
+			if (programme == null || programme.isEmpty()) {
+				return "Programme is required.";
+			}
+		}
+		return null;
+	}
+	
+	public boolean registerUser(String userId, String password, String name,
 							String faculty, String contact, String role, String programme){
 		
-		// 1. validate input
-		if(!Validator.validateUserId(userId)) {
-			System.out.println("Invalid User ID format.");
-			return;
-		}
-		
-		if(!Validator.validatePassword(password)) {
-			System.out.println("Password must be at least 6 characters.");
-			return;
-		}
-		
-		if(!Validator.validateContactNumber(contact)) {
-			System.out.println("Invalid contact number.");
-			return;
-		}
-		
-		// 2. duplicate check
-		if(getUserById(userId) != null) {
+		if (getUserById(userId) != null) {
 			System.out.println("User ID already exists.");
-			return;
-		}
+			return false;
+	    }
 		
-		// 3. create user
 		User newUser;
 		
 		if(role.equalsIgnoreCase("Student")) {
-			if(programme == null || programme.isEmpty()) {
-				System.out.println("Programme is required for Student.");
-				return;
-			}
 			newUser = new Student(userId, password, name, faculty, contact, programme);
-		}
-		
-		else if(role.equalsIgnoreCase("Staff")) {
+		} else if(role.equalsIgnoreCase("Staff")) {
 			newUser = new Staff(userId, password, name, faculty, contact);
 			
-		}
-		
-		else {
+		} else {
 			System.out.println("Invalid role.");
-			return;
+			return false;
 		}
 		
 		// 4. Store
 		users.add(newUser);
 		saveUsers();
 		System.out.println("User registered successfully.");
+		return true;
 	}
 	
 	public User loginUser(String userId,String password){

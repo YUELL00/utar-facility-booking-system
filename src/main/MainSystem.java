@@ -79,32 +79,110 @@ public class MainSystem {
 	private void handleRegister() {
 		System.out.println("\n=== Register Account ===");
 		
-		System.out.println("User ID: ");
-		String userID = scanner.nextLine();
+		// ===== User ID =====
+		String userId;
+		while (true) {
+			System.out.print("User ID: ");
+			userId = scanner.nextLine();
 		
-		System.out.println("Password: ");
-		String password = scanner.nextLine();
-		
-		System.out.println("Name: ");
-		String name = scanner.nextLine();
-		
-		System.out.println("Faculty/Department: ");
-		String faculty = scanner.nextLine();
-		
-		System.out.println("Contact Number: ");
-		String contact = scanner.nextLine();
-		
-		System.out.println("Role (Student/Staff): ");
-		String role = scanner.nextLine();
-		
-		String programme = null;
-
-		if(role.equalsIgnoreCase("Student")) {
-			System.out.print("Programme: ");
-			programme = scanner.nextLine();
+			String err = userManager.validateUserId(userId);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+			}
+			break;
 		}
 		
-		userManager.registerUser(userID, password, name, faculty, contact, role, programme);
+		// ===== Password =====
+		String password;
+		while (true) {
+			System.out.print("Password: ");
+			password = scanner.nextLine();
+	
+			String err = userManager.validatePassword(password);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+			}
+			break;
+		}
+		
+		// ===== Name =====
+		String name;
+		while (true) {
+			System.out.print("Name: ");
+			name = scanner.nextLine();
+	
+			if (name == null || name.trim().isEmpty()) {
+				System.out.println("Name cannot be empty.");
+				continue;
+			}
+			break;
+		}
+		
+		String faculty;
+		while (true) {
+			System.out.print("Faculty/Department: ");
+			faculty = scanner.nextLine();
+	
+			if (faculty == null || faculty.trim().isEmpty()) {
+				System.out.println("Faculty/Department cannot be empty.");
+				continue;
+			}
+			break;
+		}
+		
+		// ===== Contact =====
+		String contact;
+		while (true) {
+			System.out.print("Contact Number: ");
+			contact = scanner.nextLine();
+			
+			String err = userManager.validateContact(contact);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+				}
+			break;
+		}
+		
+		// ===== Role =====
+		String role;
+		while (true) {
+			System.out.print("Role (Student/Staff): ");
+			role = scanner.nextLine();
+			
+			String err = userManager.validateRole(role);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+				}
+			break;
+		}
+		
+		// ===== Programme (only for Student) =====
+		String programme = null;
+		
+		if (role.equalsIgnoreCase("Student")) {
+			while (true) {
+				System.out.print("Programme: ");
+				programme = scanner.nextLine();
+
+				String err = userManager.validateProgramme(role, programme);
+				if (err != null) {
+					System.out.println(err);
+					continue;
+				}
+				break;
+			}
+		}
+		
+		// ===== Final Create =====
+		boolean success = userManager.registerUser(userId, password, name, faculty, 
+													contact, role, programme);
+		if (!success) {
+			System.out.println("Registration failed.");
+		}
 	}
 
 	// Login
