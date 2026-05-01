@@ -6,13 +6,13 @@ import storage.UserStorage;
 
 public class UserManager {
 
-	private ArrayList<User> users;
+	private static volatile ArrayList<User> users;
 	private UserStorage userStorage;
 	
 	public UserManager(){
 		users = new ArrayList<>();
-		
 		userStorage = new UserStorage("users.txt");
+		loadUsers();
 	}
 	
 	public void registerUser(String userId, String password, String name,
@@ -106,8 +106,10 @@ public class UserManager {
 	}
 	
 	public void loadUsers(){
+		users.clear();
 		// load all users to memory
 		ArrayList<User> loaded = userStorage.load();
+		
 		for(User u : loaded){
 			if(u != null){
 				users.add(u);

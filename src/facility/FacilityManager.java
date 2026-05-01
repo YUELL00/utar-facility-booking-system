@@ -1,6 +1,9 @@
 package facility;
 
+import java.time.LocalTime;
 import java.util.*;
+
+import booking.BookingManager;
 import storage.FacilityStorage;
 
 public class FacilityManager {
@@ -28,7 +31,8 @@ public class FacilityManager {
 	}
 	
 	// search facility
-	public List<Facility> searchFacilities(String date, String timeSlot, String type) {
+	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end, 
+											String type, BookingManager bookingManager) {
 		
 		List<Facility> result = new ArrayList<>();
 		
@@ -43,7 +47,6 @@ public class FacilityManager {
 			// availability filter
 			if (!f.checkAvailability()) {
 				continue;
-				
 			}
 			
 			result.add(f);

@@ -13,12 +13,10 @@ Student,U012,pass123,Ling,FCI,0123456700,Software Engineering
 Student,U013,pass123,Mei,FICT,0123456701,Computer Science
 Student,U014,pass123,Nadia,FOE,0123456702,Chemical Engineering
 Student,U015,pass123,Oscar,FCI,0123456703,Software Engineering
-
 Staff,S001,staff123,Lim,FICT,0198765432,NULL
 Staff,S002,staff123,Tan,FCI,0198765433,NULL
 Staff,S003,staff123,Ravi,FOE,0198765434,NULL
 Staff,S004,staff123,Lee,FICT,0198765435,NULL
 Staff,S005,staff123,Wong,FCI,0198765436,NULL
-
 Admin,A001,admin123,AdminUser1,IT,0111111111,NULL
 Admin,A002,admin123,AdminUser2,IT,0111111112,NULL
