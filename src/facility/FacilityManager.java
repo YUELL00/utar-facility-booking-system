@@ -32,9 +32,9 @@ public class FacilityManager {
 	}
 	
 	// search facility
-	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end,
-									String type, BookingManager bookingManager) {
-		
+	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end, 
+											String type, BookingManager bookingManager) {
+	
 		// 1. Validate Input
 		if (date == null || date.isEmpty() || start == null || end == null) {
 			throw new IllegalArgumentException("Invalid input");
