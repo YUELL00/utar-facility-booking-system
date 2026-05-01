@@ -35,8 +35,22 @@ public class BookingManager{
 		
 		this.currentUser = user;
 	}
+
+	public boolean isBooked(String facilityId, TimeSlot timeSlot) {
+
+		for (Booking b : bookings) {
+
+			if (b.getFacilityId().equals(facilityId)) {
 	
-	
+				if (b.getTimeSlot().overlaps(timeSlot)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public void createBooking() {
 		
 		String currentUserId = currentUser.getUserId();
@@ -61,23 +75,81 @@ public class BookingManager{
 		
 		
 		//timeSlot
+		//must declare outside loops (cannot pass data if declare inside loops)
+		LocalDate date = null;
+		LocalTime startTime = null;
+		LocalTime endTime = null;
 		TimeSlot trueTimeSlot = null;
 		
 		while(true) {
-			try {
-					
+			
+			while(true) {
 				System.out.print("\nEnter date(Ex:2026-05-01): ");
 				String inputDate = input.nextLine();
-				LocalDate date = LocalDate.parse(inputDate);
 				
+				try {
+					
+					date = LocalDate.parse(inputDate);
+					
+					if(date.isBefore(LocalDate.now())) {
+						System.out.println("\nInvalid Date! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;	//restart from while loop header
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Date Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			while(true) {
 				System.out.print("\nEnter start time(Ex:10:00): ");
 				String inputStartTime = input.nextLine();
-				LocalTime startTime = LocalTime.parse(inputStartTime);
 				
+				try {
+					startTime = LocalTime.parse(inputStartTime);
+					
+					if(startTime.isBefore(LocalTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			while(true) {			
 				System.out.print("\nEnter end time(Ex:12:00): ");
 				String inputEndTime = input.nextLine();
-				LocalTime endTime = LocalTime.parse(inputEndTime);
 				
+				try {
+					endTime = LocalTime.parse(inputEndTime);
+					
+					if(endTime.isBefore(LocalTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}else if(endTime.isBefore(startTime)) {
+						System.out.println("\nInvalid Time!");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			
+			try {
 				TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
 				
 				if( checkConflict(null, trueFacilityId, timeSlot) ) {
@@ -90,10 +162,11 @@ public class BookingManager{
 				}
 			}
 			catch(Exception e) {
-				System.out.println("\nInvalid Time!");
+				System.out.println("\nFalse Time Format!");
+				System.out.println("Please Re-enter: ");
 			}
-			System.out.println("Please Re-enter: ");
-		}	
+		}		
+		
 		
 		//purpose
 		System.out.print("\nEnter purpose: ");
@@ -172,25 +245,83 @@ public class BookingManager{
 		}
 		
 		//timeSlot
+		//must declare outside loops (cannot pass data if declare inside loops)
+		LocalDate date = null;
+		LocalTime startTime = null;
+		LocalTime endTime = null;
 		TimeSlot trueTimeSlot = null;
 		
 		while(true) {
-			try {
-				
-				System.out.print("\nEnter new date(Ex:2026-05-02): ");
+			
+			while(true) {
+				System.out.print("\nEnter date(Ex:2026-05-02): ");
 				String inputDate = input.nextLine();
-				LocalDate date = LocalDate.parse(inputDate);
-						
-				System.out.print("\nEnter new start time(Ex:13:00): ");
-				String inputStartTime = input.nextLine();
-				LocalTime startTime = LocalTime.parse(inputStartTime);
-						
-				System.out.print("\nEnter new end time(Ex:15:00): ");
-				String inputEndTime = input.nextLine();
-				LocalTime endTime = LocalTime.parse(inputEndTime);
 				
-				TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+				try {
 					
+					date = LocalDate.parse(inputDate);
+					
+					if(date.isBefore(LocalDate.now())) {
+						System.out.println("\nInvalid Date! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;	//restart from while loop header
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Date Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			while(true) {
+				System.out.print("\nEnter start time(Ex:13:00): ");
+				String inputStartTime = input.nextLine();
+				
+				try {
+					startTime = LocalTime.parse(inputStartTime);
+					
+					if(startTime.isBefore(LocalTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			while(true) {			
+				System.out.print("\nEnter end time(Ex:15:00): ");
+				String inputEndTime = input.nextLine();
+				
+				try {
+					endTime = LocalTime.parse(inputEndTime);
+					
+					if(endTime.isBefore(LocalTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}else if(endTime.isBefore(startTime)) {
+						System.out.println("\nInvalid Time!");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			
+			try {
+				TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+				
 				//check new input
 				if(checkConflict(trueBookingId, getFacilityIdByBookingId(trueBookingId), timeSlot)) {
 				
@@ -198,14 +329,15 @@ public class BookingManager{
 					break;
 				}
 				else {
-					System.out.println("\nModified Fail.");
+					System.out.println("Please Re-enter: ");
 				}
 			}
 			catch(Exception e) {
-				System.out.println("\nInvalid Time!");
+				System.out.println("\nFalse Time Format!");
+				System.out.println("Please Re-enter: ");
 			}
-			System.out.println("Please Re-enter: ");
-		}	
+		
+		}		
 		
 		//purpose
 		System.out.print("\nEnter new purpose: ");
@@ -445,32 +577,32 @@ public class BookingManager{
 			//just check PENDING & APPROVED
 			if(b.getStatus().equals(BookingStatus.REJECTED)) {
 				
-				continue;	//= skip
+				continue;	//= skip this b, loops next again
 			}
 			
 			//skip when modify, 
 			//because new time maybe will conflict the old(actually will be replace)
-			if(bookingId != null && !bookingId.isEmpty() && 
-					b.getBookingId().equals(bookingId)) {
+			if(bookingId != null && b.getBookingId().equals(bookingId)) {
 				continue;	//= skip
 			}
 			
-			//different facility
+			//skip when different facility
 			if(!b.getFacilityId().equals(facilityId)) {
 				continue;
 			}
 			
+			//check when same facility
 			if(b.getFacilityId().equals(facilityId)) {
 				
-				if(!b.getTimeSlot().overlaps(timeSlot)) {
-					System.out.println("\nOK, No Time Conflict.");
-					return true;
+				if(b.getTimeSlot().overlaps(timeSlot)) {
+					System.out.println("\nTime Conflict!");
+					return false;
 				}
 			}
 		}
 		
-		System.out.println("\nTime Conflict!");
-		return false;
+		System.out.println("\nOK, No Time Conflict.");
+		return true;
 		
 	}
 

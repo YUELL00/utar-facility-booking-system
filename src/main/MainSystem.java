@@ -1,5 +1,7 @@
 package main;
 
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Scanner;
 
 import user.*;
@@ -42,9 +44,68 @@ public class MainSystem {
 		System.out.println("\n====== System Started ======");
 	
 		while (true) {
-			login();
-			handleUserMenu(currentUser);
+			displayWelcomeMenu();
+			int choice = getMenuChoice();
+			
+			switch (choice) {
+				case 1:
+					login();
+					handleUserMenu(currentUser);
+					break;
+					
+				case 2:
+					handleRegister();
+					break;
+					
+				case 0:
+					exitSystem();
+					System.exit(0);
+					break;
+					
+				default:
+					System.out.println("Invalid choice.");
+			}
 		}
+	}
+	
+	// Welcome Menu
+	private void displayWelcomeMenu() {
+		System.out.println("\n=== Welcome ===");
+		System.out.println("1. Login");
+		System.out.println("2. Register");
+		System.out.println("0. Exit");
+	}
+	
+	// Register
+	private void handleRegister() {
+		System.out.println("\n=== Register Account ===");
+		
+		System.out.println("User ID: ");
+		String userID = scanner.nextLine();
+		
+		System.out.println("Password: ");
+		String password = scanner.nextLine();
+		
+		System.out.println("Name: ");
+		String name = scanner.nextLine();
+		
+		System.out.println("Faculty/Department: ");
+		String faculty = scanner.nextLine();
+		
+		System.out.println("Contact Number: ");
+		String contact = scanner.nextLine();
+		
+		System.out.println("Role (Student/Staff): ");
+		String role = scanner.nextLine();
+		
+		String programme = null;
+
+		if(role.equalsIgnoreCase("Student")) {
+			System.out.print("Programme: ");
+			programme = scanner.nextLine();
+		}
+		
+		userManager.registerUser(userID, password, name, faculty, contact, role, programme);
 	}
 
 	// Login
@@ -153,20 +214,31 @@ public class MainSystem {
 			}
 		}
 	}
+	
+	
 
 	// Facility
 	private void handleFacilitySearch() {
 
-		System.out.print("Enter date(Ex:2026-05-01): ");
+		System.out.print("Date (yyyy-mm-dd): ");
 		String date = scanner.nextLine();
-	
-		System.out.print("Time Slot: ");
-		String timeSlot = scanner.nextLine();
-	
+
+		System.out.print("Start time (HH:mm): ");
+		LocalTime start = LocalTime.parse(scanner.nextLine());
+
+		System.out.print("End time (HH:mm): ");
+		LocalTime end = LocalTime.parse(scanner.nextLine());
+
 		System.out.print("Type: ");
 		String type = scanner.nextLine();
-	
-		facilityManager.searchFacilities(date, timeSlot, type);
+
+		List<Facility> result = facilityManager.searchFacilities(date, start, end, type, bookingManager);
+
+		if (result.isEmpty()) {
+			System.out.println("No available facilities found.");
+		} else {
+			result.forEach(System.out::println);
+		}
 	}
 
 	// Booking

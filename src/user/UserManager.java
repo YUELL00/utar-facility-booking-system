@@ -15,42 +15,54 @@ public class UserManager {
 		userStorage = new UserStorage("users.txt");
 	}
 	
-	public void registerUser(User user){
-		/*  Function:
-		 *  1. Check whether the user ID already exists
-		 *  2. Create a new user record in memory
-		 *  3. Update the data to persistent storage
-		 *  */
-		if(user == null) {
-			System.out.println("Invalid user data.");
-			return;
-		}
+	public void registerUser(String userId, String password, String name,
+							String faculty, String contact, String role, String programme){
 		
-		// validate userId
-		if(!Validator.validateUserId(user.getUserId())) {
+		// 1. validate input
+		if(!Validator.validateUserId(userId)) {
 			System.out.println("Invalid User ID format.");
 			return;
 		}
 		
-		// validate password
-		if(!Validator.validatePassword(user.getPassword())) {
+		if(!Validator.validatePassword(password)) {
 			System.out.println("Password must be at least 6 characters.");
 			return;
 		}
 		
-		// validate contact
-		if(!Validator.validateContactNumber(user.getContactNumber())) {
+		if(!Validator.validateContactNumber(contact)) {
 			System.out.println("Invalid contact number.");
 			return;
 		}
 		
-		// duplicate check
-		if(getUserById(user.getUserId()) != null){
+		// 2. duplicate check
+		if(getUserById(userId) != null) {
 			System.out.println("User ID already exists.");
 			return;
 		}
 		
-		users.add(user);
+		// 3. create user
+		User newUser;
+		
+		if(role.equalsIgnoreCase("Student")) {
+			if(programme == null || programme.isEmpty()) {
+				System.out.println("Programme is required for Student.");
+				return;
+			}
+			newUser = new Student(userId, password, name, faculty, contact, programme);
+		}
+		
+		else if(role.equalsIgnoreCase("Staff")) {
+			newUser = new Staff(userId, password, name, faculty, contact);
+			
+		}
+		
+		else {
+			System.out.println("Invalid role.");
+			return;
+		}
+		
+		// 4. Store
+		users.add(newUser);
 		saveUsers();
 		System.out.println("User registered successfully.");
 	}
