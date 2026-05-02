@@ -50,6 +50,9 @@ public class MainSystem {
 			switch (choice) {
 				case 1:
 					login();
+					if (currentUser == null) {
+						break;
+					}
 					checkUpcomingBookings();
 					handleUserMenu(currentUser);
 					break;
@@ -78,36 +81,81 @@ public class MainSystem {
 		System.out.println("0. Exit");
 	}
 	
+	// Login
+	private void login() {
+		while (true) {
+
+			System.out.print("User ID (Enter 0 to exit): ");
+			String userId = scanner.nextLine();
+				
+			if (userId.equals("0")) {
+				System.out.println("Exit login.");
+				return;
+			}
+					
+			System.out.print("Password: ");
+			String password = scanner.nextLine();
+
+			User user = userManager.loginUser(userId, password);
+
+			if (user != null) {
+				currentUser = user;
+					
+				//booking.getCurrentUser
+				bookingManager.setCurrentUser(user);
+	
+				System.out.println("Login successful.");
+				break;
+			} else {
+				System.out.println("Invalid credentials. Try again.");
+			}
+		}
+	}
+		
 	// Register
 	private void handleRegister() {
 
 		System.out.println("\n======= Register Account =======");
 		
 		// ===== User ID =====
+		
 		String userId;
 		while (true) {
-			System.out.print("User ID: ");
+			System.out.print("Student ID / Staff ID (Enter 0 to exit): ");
 			userId = scanner.nextLine();
-		
+			
+			if (userId.equals("0")) {
+				System.out.println("Exit registration.");
+				return;
+			}
+			
 			String err = userManager.validateUserId(userId);
 			if (err != null) {
 				System.out.println(err);
 				continue;
 			}
+			
 			break;
 		}
-		
+
 		// ===== Password =====
 		String password;
+		
 		while (true) {
-			System.out.print("Password: ");
+			System.out.print("Password (Enter 0 to exit): ");
 			password = scanner.nextLine();
-	
+			
+			if (password.equals("0")) {
+				System.out.println("Exit registration.");
+				return;
+			}
+			
 			String err = userManager.validatePassword(password);
 			if (err != null) {
 				System.out.println(err);
 				continue;
 			}
+			
 			break;
 		}
 		
@@ -189,31 +237,7 @@ public class MainSystem {
 		}
 	}
 
-	// Login
-	private void login() {
-		while (true) {
 	
-			System.out.print("User ID: ");
-			String userId = scanner.nextLine();
-		
-			System.out.print("Password: ");
-			String password = scanner.nextLine();
-		
-			User user = userManager.loginUser(userId, password);
-		
-			if (user != null) {
-				currentUser = user;
-				
-				//booking.getCurrentUser
-				bookingManager.setCurrentUser(user);
-				
-				System.out.println("Login successful.");
-				break;
-			} else {
-				System.out.println("Invalid credentials. Try again.");
-			}
-		}
-	}
 
 	// Main menu
 	public void displayMainMenu() {
