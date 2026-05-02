@@ -120,11 +120,14 @@ public class MainSystem {
 		// ===== Role =====
 		String role;
 		while (true) {
-			System.out.print("Role (Student/Staff): ");
+			System.out.println("Note: Admin accounts cannot be registered manually, ");
+			System.out.println("Only Student and Staff accounts can be registered, ");
+			System.out.println("Please select either Student or Staff. \n");
+			System.out.print("Role: ");
 			role = scanner.nextLine();
 			
 			if (role.equals("0")) {
-				System.out.println("Exit registration.");
+				System.out.println("Exit regisThey are created and managed by the system administrator.tration.");
 				return;
 			}
 			
@@ -133,6 +136,7 @@ public class MainSystem {
 				System.out.println(err);
 				continue;
 			}
+			role = userManager.normalizeRole(role);
 			break;
 		}
 		
@@ -148,7 +152,7 @@ public class MainSystem {
 				return;
 			}
 			
-			String err = userManager.validateUserId(userId);
+			String err = userManager.validateUserId(userId, role);
 			if (err != null) {
 				System.out.println(err);
 				continue;
@@ -206,7 +210,7 @@ public class MainSystem {
 		// ===== Programme (only for Student) =====
 		String programme = null;
 		
-		if (role.equalsIgnoreCase("Student")) {
+		if (role.equals("Student")) {
 			while (true) {
 				System.out.print("Programme: ");
 				programme = scanner.nextLine();
@@ -366,7 +370,7 @@ public class MainSystem {
 			System.out.println("3. Cancel Booking");
 			
 			//check admin role
-			if(user.getRole().equalsIgnoreCase("Admin")) {
+			if(user.getRole().equals("Admin")) {
 				
 				System.out.println("4. Show All Bookings");
 				System.out.println("5. Approve Booking");
@@ -395,7 +399,7 @@ public class MainSystem {
 					break;
 				
 				case 4:
-					if(user.getRole().equalsIgnoreCase("Admin")) {
+					if(user.getRole().equals("Admin")) {
 						System.out.println("\nShow All Bookings...\n");
 						bookingManager.showAllBookings();
 						break;
@@ -405,7 +409,7 @@ public class MainSystem {
 					}
 				
 				case 5:
-					if(user.getRole().equalsIgnoreCase("Admin")) {
+					if(user.getRole().equals("Admin")) {
 						System.out.println("\nApprove Booking...");
 						bookingManager.approveBooking();
 						break;
@@ -415,7 +419,7 @@ public class MainSystem {
 					}
 					
 				case 6:
-					if(user.getRole().equalsIgnoreCase("Admin")) {
+					if(user.getRole().equals("Admin")) {
 						System.out.println("\nReject Booking...");
 						bookingManager.rejectBooking();
 						break;

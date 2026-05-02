@@ -15,9 +15,39 @@ public class UserManager {
 		loadUsers();
 	}
 	
-	public String validateUserId(String userId) {
+	public String normalizeRole(String role) {
+		if (role == null) return null;
+		role = role.trim().toLowerCase();
+		switch (role) {
+			case "student":
+				return "Student";
+			case "staff":
+				return "Staff";
+			default:
+				return null;
+		}
+	}
+	
+	public String validateRole(String role) {
+		String normalized = normalizeRole(role);
+		
+		if (normalized == null) {
+			return "Invalid role.";
+		}
+		return null;
+	}
+	
+	public String validateUserId(String userId, String role) {
 		if (!Validator.validateUserId(userId)) {
 			return "Invalid User ID format.";
+		}
+		
+		char prefix = userId.charAt(0);
+		if (role.equalsIgnoreCase("Student") && prefix != 'U') {
+			return "Student ID must start with 'U'.";
+		}
+		if (role.equalsIgnoreCase("Staff") && prefix != 'S') {
+			return "Staff ID must start with 'S'.";
 		}
 		
 		if (getUserById(userId) != null) {
@@ -37,13 +67,6 @@ public class UserManager {
 	public String validateContact(String contact) {
 		if (!Validator.validateContactNumber(contact)) {
 			return "Invalid contact number. Must be 11-digit Malaysian phone number.)";
-		}
-		return null;
-	}
-	
-	public String validateRole(String role) {
-		if (!(role.equalsIgnoreCase("Student") || role.equalsIgnoreCase("Staff"))) {
-			return "Invalid role.";
 		}
 		return null;
 	}

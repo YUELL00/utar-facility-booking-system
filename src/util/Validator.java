@@ -5,7 +5,7 @@ public class Validator {
 	// User Validation
 	
 	public static boolean validateUserId(String userId) {
-		if (userId == null || userId.length() < 2)
+		if (userId == null || userId.length() != 4)
 			return false;
 		
 		char first = userId.charAt(0);
