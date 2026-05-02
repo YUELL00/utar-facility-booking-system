@@ -29,14 +29,14 @@ public class UserManager {
 	
 	public String validatePassword(String password) {
 		if (!Validator.validatePassword(password)) {
-			return "Password must be at least 6 characters.";
+			return "Password must be at least 8 characters and include uppercase, lowercase, digit, and special character.";
 			}
 		return null;
 	}
 	
 	public String validateContact(String contact) {
 		if (!Validator.validateContactNumber(contact)) {
-			return "Invalid contact number.";
+			return "Invalid contact number. Must be 11-digit Malaysian phone number.)";
 		}
 		return null;
 	}

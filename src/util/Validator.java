@@ -20,11 +20,35 @@ public class Validator {
 	}
 
 	public static boolean validatePassword(String password) {
-		return password != null && password.length() >= 6;
+		if (password == null || password.length() < 8) {
+			return false;
+		}
+		
+		boolean hasUpper = false;
+		boolean hasLower = false;
+		boolean hasDigit = false;
+		boolean hasSpecial = false;
+		
+		for (char c : password.toCharArray()) {
+			if (Character.isUpperCase(c)) {
+				hasUpper = true;
+			}
+			else if (Character.isLowerCase(c)) {
+				hasLower = true;
+			}
+			else if (Character.isDigit(c)) {
+				hasDigit = true;
+			}
+			else {
+				hasSpecial = true;
+			}
+		}
+		
+		return hasUpper && hasLower && hasDigit && hasSpecial;
 	}
 
 	public static boolean validateContactNumber(String contact) {
-		if (contact == null || contact.length() < 10) 
+		if (contact.length() != 11) 
 			return false;
 		
 		for (int i = 0; i < contact.length(); i++) {

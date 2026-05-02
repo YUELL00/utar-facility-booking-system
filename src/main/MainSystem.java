@@ -117,6 +117,20 @@ public class MainSystem {
 
 		System.out.println("\n======= Register Account =======");
 		
+		// ===== Role =====
+		String role;
+		while (true) {
+			System.out.print("Role (Student/Staff): ");
+			role = scanner.nextLine();
+			
+			String err = userManager.validateRole(role);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+				}
+			break;
+		}
+		
 		// ===== User ID =====
 		
 		String userId;
@@ -184,34 +198,6 @@ public class MainSystem {
 			break;
 		}
 		
-		// ===== Contact =====
-		String contact;
-		while (true) {
-			System.out.print("Contact Number: ");
-			contact = scanner.nextLine();
-			
-			String err = userManager.validateContact(contact);
-			if (err != null) {
-				System.out.println(err);
-				continue;
-				}
-			break;
-		}
-		
-		// ===== Role =====
-		String role;
-		while (true) {
-			System.out.print("Role (Student/Staff): ");
-			role = scanner.nextLine();
-			
-			String err = userManager.validateRole(role);
-			if (err != null) {
-				System.out.println(err);
-				continue;
-				}
-			break;
-		}
-		
 		// ===== Programme (only for Student) =====
 		String programme = null;
 		
@@ -227,6 +213,20 @@ public class MainSystem {
 				}
 				break;
 			}
+		}
+		
+		// ===== Contact =====
+		String contact;
+		while (true) {
+			System.out.print("Contact Number: ");
+			contact = scanner.nextLine();
+			
+			String err = userManager.validateContact(contact);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+				}
+			break;
 		}
 		
 		// ===== Final Create =====
