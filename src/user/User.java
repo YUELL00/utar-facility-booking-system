@@ -47,9 +47,9 @@ public abstract class User {
 	public String getProfileInfo(){ 
 		return "\nUser ID: " + userId + 
 				"\nName: " + name + 
-				"\nFaculty/Department: " + facultyOrDepartment + 
+				"\nRole: " + getRole() +
 				"\nContact: " + contactNumber + 
-				"\nRole: " + getRole();
+				"\nFaculty/Department: " + facultyOrDepartment;
 	}
 	
 	public void viewProfile() {

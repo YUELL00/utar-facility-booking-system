@@ -123,11 +123,16 @@ public class MainSystem {
 			System.out.print("Role (Student/Staff): ");
 			role = scanner.nextLine();
 			
+			if (role.equals("0")) {
+				System.out.println("Exit registration.");
+				return;
+			}
+			
 			String err = userManager.validateRole(role);
 			if (err != null) {
 				System.out.println(err);
 				continue;
-				}
+			}
 			break;
 		}
 		
@@ -287,6 +292,7 @@ public class MainSystem {
 		
 				case 1:
 				user.viewProfile();
+				pause("\nPress Enter to continue...");
 				break;
 			
 				case 2:
@@ -320,7 +326,10 @@ public class MainSystem {
 		}
 	}
 	
-	
+	private void pause(String message) {
+	    System.out.print(message);
+	    scanner.nextLine();
+	}
 
 	// Facility
 	private void handleFacilitySearch() {
