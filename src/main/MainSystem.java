@@ -85,11 +85,11 @@ public class MainSystem {
 	private void login() {
 		while (true) {
 
-			System.out.print("User ID (Enter 0 to exit): ");
+			System.out.print("User ID (Enter 0 to back): ");
 			String userId = scanner.nextLine();
 				
 			if (userId.equals("0")) {
-				System.out.println("Exit login.");
+				System.out.println("Exit login...");
 				return;
 			}
 					
@@ -144,11 +144,11 @@ public class MainSystem {
 		
 		String userId;
 		while (true) {
-			System.out.print("Student ID / Staff ID (Enter 0 to exit): ");
+			System.out.print("User ID (Enter 0 to back): ");
 			userId = scanner.nextLine();
 			
 			if (userId.equals("0")) {
-				System.out.println("Exit registration.");
+				System.out.println("Exit registration...");
 				return;
 			}
 			
@@ -165,11 +165,11 @@ public class MainSystem {
 		String password;
 		
 		while (true) {
-			System.out.print("Password (Enter 0 to exit): ");
+			System.out.print("Password (Enter 0 to back): ");
 			password = scanner.nextLine();
 			
 			if (password.equals("0")) {
-				System.out.println("Exit registration.");
+				System.out.println("Exit registration...");
 				return;
 			}
 			
@@ -295,8 +295,7 @@ public class MainSystem {
 			switch (choice) {
 		
 				case 1:
-				user.viewProfile();
-				pause("\nPress Enter to continue...");
+				handleViewProfile();
 				break;
 			
 				case 2:
@@ -333,6 +332,47 @@ public class MainSystem {
 	private void pause(String message) {
 	    System.out.print(message);
 	    scanner.nextLine();
+	}
+	
+	private void handleViewProfile() {
+		while (true) {
+			System.out.println("\n======= My Profile =======");
+			currentUser.viewProfile();
+			
+			System.out.println("\nEnter 1 to Edit Contact.\nEnter 0 to Back.");
+			
+			int choice = getMenuChoice();
+			
+			switch (choice) {
+				case 1:
+					editContact();
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Invalid choice.");
+			}
+		}
+	}
+	
+	private void editContact() {
+		while (true) {
+			System.out.print("Enter new contact (0 to cancel): ");
+			String newContact = scanner.nextLine();
+			
+			if (newContact.equals("0")) {
+				return;
+			}
+			
+			String err = userManager.validateContact(newContact);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+			}
+			
+			userManager.updateUser(currentUser, newContact);
+			break;
+		}
 	}
 
 	// Facility
