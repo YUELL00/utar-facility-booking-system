@@ -4,12 +4,16 @@ import java.time.*;
 import java.util.*;
 import storage.*;
 import user.*;
+import java.util.*;
+import java.time.LocalDate;
+import storage.MaintenanceStorage;
+
 public class MaintenanceManager {
 	Scanner input = new Scanner(System.in);
 	
-	private ArrayList<MaintenanceReport> reports;
-	
 	private MaintenanceStorage maintenanceStorage;
+	
+	private ArrayList<MaintenanceReport> reports;
 	
 	private int size;
 	
@@ -23,138 +27,59 @@ public class MaintenanceManager {
 	}
 	
 	public void createMaintenanceReport() { //feedback
-		String status, choice, description;
-		String reportId = String.format("R%03d", size);
-		String userId = UserManager.getCurrentUser().getUserId();
-		MaintenanceReport report;
-		
-		//get the current date
-		LocalDate now = LocalDate.now();
-		String reportDate = now.toString();
-		
+		Scanner sc = new Scanner(System.in);
+
 		System.out.println("Enter the facility Id (Ex: F001): ");
-		String facilityId = input.nextLine();
-		System.out.println("===Issue Type===");
-		System.out.println("1. Feedback");
-		System.out.println("2. Maintenance");
-		do {
-			System.out.println("Choose the issue type you want to report: ");
-			choice = input.nextLine();
-			switch(choice) {
-			case "1":
-				System.out.println("Enter the issue description: ");
-				description = input.nextLine();
-				
-				report = new MaintenanceReport(reportId, facilityId, userId, description, reportDate);
-				System.out.println("Feedback created successfully");
-				break;
-				
-			case "2":
-				System.out.println("Enter the issue description: ");
-				description = input.nextLine();
-				
-				report = new MaintenanceReport(reportId, facilityId, userId, "NULL", description, reportDate, "NULL", "NULL", "PENDING");
-				reports.add(report);
-				size++;
-				saveReports();
-				System.out.println("Report created successfully");
-				break;
-				
-			default:
-				System.out.println("Invalid Input");
-				break;
-			}
-		}while(!(choice.equals("1")) && !(choice.equals("2")));
-		//end
+		String facilityId = sc.nextLine();
+
+		System.out.println("Enter the issue description: ");
+		String description = sc.nextLine();
+
+		// generate reportId
+		String reportId = "R" + (size + 1);
+		String userId = "U001";
+
+		LocalDate reportDate = LocalDate.now();
+		
+		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, null, 
+				description, reportDate, null, null, "PENDING", "LOW");
+		reports.add(report);
+		size++;
 	}
 	
 	public void assignMaintenance(String reportId, String userId) {//WIP
 		MaintenanceReport report = null;
-		String status = null;
-		String choice;
-		int i = 0;
-		for(MaintenanceReport r : reports) {
-			if(r.getReportId().equals(reportId)) {
-				report = r;
+		int i = 0;  
+		while(i < size) {  
+			report = reports.get(i); 
+			if(report.getReportId().equals(reportId)) { 
+				//report.assignTo(userId);
+				report.updateTaskStatus("IN_PROGRESS");
+				reports.set(i, report);
 				break;
-			} else {
+			}else { 
 				i++;
-			}
-		}
-		
-		//Approve or Reject the Maintenance task
-		System.out.println("1. Approve");
-		System.out.println("2. Reject");
-		do {
-			System.out.println("Your choice: ");
-			choice = input.nextLine();
-			switch(choice) {
-			case "1":
-				status = "APPROVED";
-				break;
-			case "2":
-				status = "REJECTED";
-				break;
-			default:
-				System.out.println("Invalid Input");
-				break;
-			}
-		}while(!(choice.equals("1")) && !(choice.equals("2")));
-		
-		report.assignTo(userId);
-		report.updateTaskStatus(status);
-		reports.set(i, report);
-			
-		saveReports();
-		System.out.println("Tasks assigned successfully");
-		//end
+			} 
+		} 
 	}
 	
-	public void updateMaintenanceStatus(String reportId, String status) {//WIP
+	public void updateMaintenanceStatus(String reportId, String status) {
 		MaintenanceReport report = null;
-		int i = 0;
-		for(MaintenanceReport r : reports) {
-			if(r.getReportId().equals(reportId)) {
-				report = r;
+		int i = 0;  
+		while(i < size) {  
+			report = reports.get(i); 
+			if(report.getReportId().equals(reportId)) { 
+				report.updateTaskStatus(status);
+				reports.set(i, report);
 				break;
-			} else {
+			}else { 
 				i++;
-			}
-		}
-		if(status == "ASSIGNED"){
-			System.out.println("Enter the start date (ex: yyyy-mm-dd): ");
-			String startDate = input.nextLine();
-			
-			report.updateTaskStatus(status);
-			report.setStartDate(startDate);
-		}else if(status == "IN_PROGRESS") {
-			report.updateTaskStatus(status);
-		}else if(status == "COMPLETED") {
-			LocalDate now = LocalDate.now();
-			String endDate = now.toString();
-			
-			report.updateTaskStatus(status);
-			report.setEndDate(endDate);
-		}
-		
-		reports.set(i, report);
-		System.out.println("Tasks status updated");
+			} 
+		} 
 	}
 	
 	public ArrayList<MaintenanceReport> getMaintenanceHistory(){
-		String userId = UserManager.getCurrentUser().getUserId();
-		ArrayList<MaintenanceReport> history = new ArrayList<>();
-		for(MaintenanceReport r : reports) {  
-			//find by using user id
-			if(r.getReportedByUserId().equals(userId)) {
-				history.add(r);
-			}
-			if(history.size() == 0) {
-				System.out.println("No any history report. ");
-			}
-			return history;
-		}
-		//end
+		return reports;
 	}
 	
 	public void getFrequentIssues() {//WIP
@@ -184,6 +109,7 @@ public class MaintenanceManager {
 	}
 	
 	public void generateMaintenanceReport() { //generate maintenance performance report
+
 		 //count
 		int assign = 0;
 		int inProgress = 0;
@@ -232,18 +158,21 @@ public class MaintenanceManager {
 		System.out.println("Completed Task: " + complete);
 		
 		getFrequentIssues();
+		//WIP
+
 	}
-	
 	
 	public void loadReports() {
 		
 		reports.clear();
 		
 		reports = maintenanceStorage.load();
+		
 	}
 	
 	public void saveReports() {
 		maintenanceStorage.save(reports);
 	}
+
 }
 
