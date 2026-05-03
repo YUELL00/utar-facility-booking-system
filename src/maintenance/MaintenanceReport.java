@@ -91,7 +91,7 @@ public class MaintenanceReport {
 	}
 	
 	public boolean isCompleted() { //WIP 
-		if("COMPLETED".equals(status)) {
+		if(this.status.equals(MaintenanceStatus.COMPLETED)) {
 			return true;
 		} else {
 			return false;

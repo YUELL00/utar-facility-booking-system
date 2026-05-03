@@ -308,7 +308,7 @@ public class MainSystem {
 				break;
 			
 				case 4:
-				handleMaintenanceMenu();
+				handleMaintenanceMenu(user);
 				break;
 			
 				case 5:
@@ -562,11 +562,17 @@ public class MainSystem {
 	}
 
 	// Maintenance
-	private void handleMaintenanceMenu() {
+	private void handleMaintenanceMenu(User user) {
 
 		System.out.println("\n======= Maintenance Menu =======");
 		System.out.println("1. Create Report");
-		System.out.println("2. View History");
+		System.out.println("2. View History Report");
+		System.out.println("3. View Feedback");
+		if(user.getRole().equals("Admin")) {
+			System.out.println("4. Assign Maintenance Task");
+			System.out.println("5. Update Maintenance Task");
+		}
+		
 		System.out.println("0. Back");
 	
 		int choice = getMenuChoice();
@@ -575,12 +581,24 @@ public class MainSystem {
 	
 			case 1:
 			System.out.println("Creating maintenance report...");
+			maintenanceManager.createMaintenanceReport();
 			break;
 		
 			case 2:
-			maintenanceManager.getMaintenanceHistory();
+			maintenanceManager.getMaintenanceHistory(user);
 			break;
 		
+			case 3:
+			
+			break;
+			
+			case 4:
+			maintenanceManager.assignMaintenance();
+			break;
+			
+			case 5:
+			maintenanceManager.updateMaintenanceStatus();
+			
 			default:
 			break;
 		}
