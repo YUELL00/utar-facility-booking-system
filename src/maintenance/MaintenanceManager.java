@@ -190,25 +190,6 @@ public class MaintenanceManager {
 		int complete = 0;
 		int reject = 0;
 		
-		int choice;
-		//Choose Time Range
-		System.out.println("===Time Range===");
-		System.out.println("1. Monthly");
-		System.out.println("2. Semester");
-		System.out.println("3. Yearly");
-		do {
-			System.out.println("Enter Your Choice: ");
-			choice = input.nextInt();
-			switch(choice) {
-			case 1:
-				
-			case 2:
-			
-			case 3:
-				
-			}
-		}while(choice <=1 && choice >=3);
-		
 		for(MaintenanceReport r : reports) {
 			switch(r.getStatus()) {
 			case "ASSIGNED":
