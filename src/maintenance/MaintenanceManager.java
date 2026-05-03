@@ -179,9 +179,11 @@ public class MaintenanceManager {
 				for(MaintenanceReport r : reports) {
 				
 					if(r.getReportId().equals(reportId)) {
-			
+						report = r;
 						found = true;
 						break;
+					}else {
+						i++;
 					}
 				}
 				
@@ -201,9 +203,11 @@ public class MaintenanceManager {
 			switch(choice) {
 			case 1:
 				report.updateTaskStatus(MaintenanceStatus.APPROVED);
+				report.assignTo(currentUserId);
 				break;
 			case 2:
 				report.updateTaskStatus(MaintenanceStatus.REJECTED);
+				report.assignTo(currentUserId);
 				break;
 			case 0:
 				return;
@@ -213,7 +217,7 @@ public class MaintenanceManager {
 			}
 		}while(choice < 0 && choice > 2);
 				
-		report.assignTo(currentUserId);
+		
 		reports.set(i, report);
 				
 		saveReports();
@@ -227,24 +231,84 @@ public class MaintenanceManager {
 		String currentUserId = currentUser.getUserId();
 		int choice;
 		String reportId;
-		do {
-			System.out.println("Enter report id (ex:R001): ");
+		LocalDate startDate = null;
+		while(true) {
+			boolean found = false;
+			
+			System.out.print("Enter report id(Ex:R001)/(Enter 0 to exit): ");
 			reportId = input.nextLine();
+			
+			if (reportId.equals("0")) {
+				System.out.println("\nExit...");
+				return;
+			}
+			
 			if(checkReportId(reportId)) {
+				
 				for(MaintenanceReport r : reports) {
+				
 					if(r.getReportId().equals(reportId)) {
 						report = r;
+						found = true;
 						break;
 					}else {
 						i++;
 					}
 				}
-			}else {
-				System.out.println("Please Re-enter: ");
+				
+				if(!found) {
+					System.out.println("No report found");
+					break;
+				}			
 			}
-		}while(!checkReportId(reportId));
+		}
+		System.out.print("\n====================");
+		System.out.print("1. In Progress");
+		System.out.print("2. Complete");
+		System.out.print("0. Back");
 		
-		
+		do {
+			System.out.println("Choose the status: ");
+		choice = input.nextInt();
+		switch(choice) {
+		case 1:
+			report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
+			while(true){
+				System.out.print("\nEnter new date(Ex:2026-05-02): ");
+				String inputDate = input.nextLine();
+				
+				try {
+					
+					startDate = LocalDate.parse(inputDate);
+					
+					if(startDate.isBefore(LocalDate.now())) {
+						System.out.println("\nInvalid Date! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;	//restart from while loop header
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Date Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			report.setStartDate(startDate);
+			reports.set(i, report);
+			break;
+			
+		case 2:
+			report.updateTaskStatus(MaintenanceStatus.COMPLETED);
+			report.setEndDate(LocalDate.now());
+			reports.set(i, report);
+			break;
+		case 0:
+			return;
+		default:
+			System.out.println("Invalid Input");
+			break;
+		}
+	}while(choice < 0 && choice > 2);
 	}
 	
 	public void getMaintenanceHistory(User currentUser){

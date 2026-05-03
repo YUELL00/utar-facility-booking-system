@@ -81,6 +81,15 @@ public class MaintenanceReport {
 		this.description = description;
 		this.reportDate = reportDate;
 	}
+	
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+	}
+	
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
+	
 	public void updateTaskStatus(MaintenanceStatus status) {
 		this.status = status;
 	}
