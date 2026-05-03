@@ -10,13 +10,13 @@ public class Booking {
 	private String facilityId;
 	private TimeSlot timeSlot;
 	private String purpose;
-	private String status;
+	private BookingStatus status;
 	private LocalDateTime createdTime;
 	private LocalDateTime lastModifiedTime;
 	
 	//constructor
 	public Booking(String bookingId, String userId, String facilityId, TimeSlot timeSlot, 
-			String purpose, String status, LocalDateTime createdTime, LocalDateTime lastModifiedTime) {
+			String purpose, BookingStatus status, LocalDateTime createdTime, LocalDateTime lastModifiedTime) {
 		this.bookingId = bookingId;
 		this.userId = userId;
 		this.facilityId = facilityId;
@@ -27,12 +27,26 @@ public class Booking {
 		this.lastModifiedTime = lastModifiedTime;
 	}
 	
-	public void setStatus(String status) {
+	//print out
+	@Override
+	public String toString() {
+		
+		return "Booking ID: " + bookingId + 
+				"\nUser ID: " + userId + 
+				"\nFacility ID: " + facilityId +
+				"\nDate: " + timeSlot.getDate() + 
+				"\nTime: " + timeSlot.getStartTime() + " - " + timeSlot.getEndTime() + 
+				"\nStatus: " + status + 
+				"\n--------------------";
+		
+	}
+	
+	public void setStatus(BookingStatus status) {
 		this.status = status;
 	}
 
-	public boolean canModify() {
-		if(status.equals("Pending")) {
+	public boolean canStatus() {
+		if(status.equals(BookingStatus.PENDING)) {
 			return true;
 		}
 		else {
@@ -40,16 +54,16 @@ public class Booking {
 		}
 	}
 	
-	public boolean canCancel() {
+	public boolean canTime() {
 		
 		// get current/now date + time
 		LocalDateTime now = LocalDateTime.now();
 		
 		// get booking date + time
-		LocalDateTime start = LocalDateTime.of(timeSlot.getDate(), timeSlot.getStartTime());
+		LocalDateTime end = LocalDateTime.of(timeSlot.getDate(), timeSlot.getEndTime());
 		
-		// now date + time > booking start time
-		if(now.isAfter(start)) {
+		// now date + time > booking end time
+		if(now.isAfter(end)) {
 			return false;
 		}
 		else {
@@ -80,13 +94,12 @@ public class Booking {
 	public TimeSlot getTimeSlot() {
 		return timeSlot;
 	}
-	
-	//seem not use
+ 
 	public String getPurpose() {
 		return purpose;
 	}
 	
-	public String getStatus() {
+	public BookingStatus getStatus() {
 		return status;
 	}
 	

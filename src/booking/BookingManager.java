@@ -24,8 +24,8 @@ public class BookingManager{
 		this.bookings = new ArrayList<>();
 		this.facilities = new ArrayList<>();
 		
-		this.bookingStorage = new BookingStorage("D:\\BookingStorage.txt");
-		this.facilityStorage = new FacilityStorage("D:\\FacilityStorage.txt");
+		this.bookingStorage = new BookingStorage("booking.txt");
+		this.facilityStorage = new FacilityStorage("facilities.txt");
 		
 	}
 	
@@ -33,273 +33,643 @@ public class BookingManager{
 	private User currentUser;
 	
 	public void setCurrentUser(User user) {
+		
 		this.currentUser = user;
 	}
+
+	public boolean isBooked(String facilityId, TimeSlot timeSlot) {
+
+		for (Booking b : bookings) {
+
+			if (b.getFacilityId().equals(facilityId)) {
+
+				if (b.getTimeSlot().overlaps(timeSlot)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 	
+	// (case 1) 
 	public void createBooking() {
 		
 		String currentUserId = currentUser.getUserId();
 		
 		//bookingId, output: BXXX , 3int , not enough = fill with 0
-		String bookingId = String.format("B%03d", bookings.size());
+		String bookingId = String.format("B%03d", bookings.size() + 1);
 		
 		//facilityId
-		System.out.print("\nEnter facilityId(Ex:F001): ");
-		String facilityId = input.nextLine();
+		String trueFacilityId = null;
+		
+		while(true) {
+			System.out.print("\nEnter facilityId(Ex:F001)/(Enter 0 to exit): ");
+			String facilityId = input.nextLine();
+			
+			if (facilityId.equals("0")) {
+				System.out.println("\nExit Creation.");
+				return;
+			}
+			
+			if(checkFacilityId(facilityId)) {
+				
+				trueFacilityId = facilityId;
+				break;
+			}
+			System.out.println("Please Re-enter: ");
+		}
+		
 		
 		//timeSlot
-		System.out.print("\nEnter date(Ex:2026-05-01): ");
-		String inputDate = input.nextLine();
-		LocalDate date = LocalDate.parse(inputDate);
+		//must declare outside loops (cannot pass data if declare inside loops)
+		LocalDate date = null;
+		LocalTime startTime = null;
+		LocalTime endTime = null;
+		TimeSlot trueTimeSlot = null;
 		
-		System.out.print("\nEnter start time(Ex:10:00): ");
-		String inputStartTime = input.nextLine();
-		LocalTime startTime = LocalTime.parse(inputStartTime);
+		while(true) {
+			
+			//check date
+			while(true) {
+				System.out.print("\nEnter date(Ex:2026-05-01): ");
+				String inputDate = input.nextLine();
+				
+				try {
+					
+					date = LocalDate.parse(inputDate);
+					
+					if(date.isBefore(LocalDate.now())) {
+						System.out.println("\nInvalid Date! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;	//restart from while loop header
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Date Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			//check start time
+			while(true) {
+				System.out.print("\nEnter start time(Ex:10:00): ");
+				String inputStartTime = input.nextLine();
+				
+				try {
+					startTime = LocalTime.parse(inputStartTime);
+					
+					LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+					
+					if(startDateTime.isBefore(LocalDateTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			//check end time
+			while(true) {			
+				System.out.print("\nEnter end time(Ex:12:00): ");
+				String inputEndTime = input.nextLine();
+				
+				try {
+					endTime = LocalTime.parse(inputEndTime);
+					
+					LocalDateTime endDateTime = LocalDateTime.of(date, endTime);
+					
+					if(endDateTime.isBefore(LocalDateTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}else if(endTime.isBefore(startTime)) {
+						System.out.println("\nInvalid Time! (end time cannot before start time)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			
+			try {
+				TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+				
+				if( checkConflict(null, trueFacilityId, timeSlot) ) {
+					
+					//save true timeSlot
+					trueTimeSlot = timeSlot;
+					
+					// no conflict --> exit loop
+					break;
+				}
+			}
+			catch(Exception e) {
+				System.out.println("\nFalse Time Format!");
+				System.out.println("Please Re-enter: ");
+			}
+		}	
 		
-		System.out.print("\nEnter end time(Ex:12:00): ");
-		String inputEndTime = input.nextLine();
-		LocalTime endTime = LocalTime.parse(inputEndTime);
-		
-		TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
 		
 		//purpose
-		System.out.print("\nEnter purpose(academic/co-curricular/official): ");
+		System.out.print("\nEnter purpose: ");
 		String purpose = input.nextLine();
 		
 		//status
-		String status = "PENDING";
+		BookingStatus status = BookingStatus.PENDING;
 		
 		//createdTime
-		LocalDateTime createdTime = LocalDateTime.now();
+		LocalDateTime createdTime = LocalDateTime.now().withSecond(0).withNano(0);
 		
 		//lastModifiedTime
-		LocalDateTime lastModifiedTime = LocalDateTime.now();
+		LocalDateTime lastModifiedTime = LocalDateTime.now().withSecond(0).withNano(0);
 		
-		Booking b = new Booking(bookingId, currentUserId, facilityId, timeSlot, 
+		Booking b = new Booking(bookingId, currentUserId, trueFacilityId, trueTimeSlot, 
 					purpose, status, createdTime, lastModifiedTime);
+			
+		bookings.add(b);
+			
+		saveBookings();
+			
+		System.out.println("\nBooking " + bookingId + " Created Successfully.");
 		
-		//ArrayList<Booking> bookings
-		if( checkConflict(null, b.getFacilityId(), b.getTimeSlot()) ) {
-			
-			bookings.add(b);
-			
-			saveBookings();
-			
-			System.out.println("Booking Created");
-		}
-		else{
-			System.out.println("Created Fail");
-		}
 	}
 	
+	// (case 2) 
 	public void modifyBooking() {
 		
 		String currentUserId = currentUser.getUserId();
 		
 		//bookingId
-		System.out.print("\nEnter bookingId(Ex:B001): ");
-		String bookingId = input.nextLine();
+		String trueBookingId = null;
+		
+		while(true) {
+			boolean found = false;
+			boolean privilege = false;
+			
+			System.out.print("\nEnter bookingId(Ex:B001)/(Enter 0 to exit): ");
+			String bookingId = input.nextLine();
+			
+			if (bookingId.equals("0")) {
+				System.out.println("\nExit Modification.");
+				return;
+			}
+			
+			if(checkBookingId(bookingId)) {
+				
+				for(Booking b : bookings) {
+				
+					if(b.getBookingId().equals(bookingId)) {
+			
+						found = true;
+						
+						if(!b.getUserId().equals(currentUserId)) {
+							System.out.println("\nNo Privileges to Modify " + bookingId + "!");
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canStatus()) {
+							System.out.println("\nCannot Modify! (booking " + bookingId + " has already been " 
+						+ b.getStatus().toString().toLowerCase() + ")");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canTime()) {
+							System.out.println("\nCannot Modify! (booking " + bookingId + " has already passed)");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						break;
+					}
+				}
+				
+				if(!privilege) {
+					return;	// stop this whole method
+				}
+				
+				if(found) {
+					trueBookingId = bookingId;
+					break;
+				}			
+			}
+		}
+			
 		
 		//timeSlot
-		System.out.print("\nEnter new date(Ex:2026-05-02): ");
-		String inputDate = input.nextLine();
-		LocalDate date = LocalDate.parse(inputDate);
-				
-		System.out.print("\nEnter new start time(Ex:13:00): ");
-		String inputStartTime = input.nextLine();
-		LocalTime startTime = LocalTime.parse(inputStartTime);
-				
-		System.out.print("\nEnter new end time(Ex:15:00): ");
-		String inputEndTime = input.nextLine();
-		LocalTime endTime = LocalTime.parse(inputEndTime);
-				
-		TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
+		//must declare outside loops (cannot pass data if declare inside loops)
+		LocalDate date = null;
+		LocalTime startTime = null;
+		LocalTime endTime = null;
+		TimeSlot trueTimeSlot = null;
 		
-		//purpose
-		System.out.print("\nEnter new purpose(academic/co-curricular/official): ");
-		String purpose = input.nextLine();
-		
-		boolean found = false;
-		
-		//ArrayList<Booking> bookings
-		//Booking b = bookings.get(i);
-		//b.modifyBooking(...) can actually modify object in bookings
-		for(Booking b : bookings) {
+		while(true) {
 			
-			if(b.getBookingId().equals(bookingId)) {
+			//check date
+			while(true) {
+				System.out.print("\nEnter new date(Ex:2026-05-02): ");
+				String inputDate = input.nextLine();
 				
-				found = true;
-				
-				if(!b.getUserId().equals(currentUserId)) {
-					System.out.println("No Privileges to Modify");
+				try {
+					
+					date = LocalDate.parse(inputDate);
+					
+					if(date.isBefore(LocalDate.now())) {
+						System.out.println("\nInvalid Date! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;	//restart from while loop header
+					}
 					break;
 				}
-
-				if(!b.canModify()) {
-					System.out.println("Cannot Modify");
+				catch(Exception e) {
+					System.out.println("\nFalse Date Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			//check start time
+			while(true) {
+				System.out.print("\nEnter new start time(Ex:13:00): ");
+				String inputStartTime = input.nextLine();
+				
+				try {
+					startTime = LocalTime.parse(inputStartTime);
+					
+					LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+					
+					if(startDateTime.isBefore(LocalDateTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
 					break;
 				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			//check end time
+			while(true) {			
+				System.out.print("\nEnter new end time(Ex:15:00): ");
+				String inputEndTime = input.nextLine();
+				
+				try {
+					endTime = LocalTime.parse(inputEndTime);
+					
+					LocalDateTime endDateTime = LocalDateTime.of(date, endTime);
+					
+					if(endDateTime.isBefore(LocalDateTime.now())) {
+						System.out.println("\nInvalid Time! (Past)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}else if(endTime.isBefore(startTime)) {
+						System.out.println("\nInvalid Time! (end time cannot before start time)");
+						System.out.println("Please Re-enter: ");
+						continue;
+					}
+					break;
+				}
+				catch(Exception e) {
+					System.out.println("\nFalse Time Format!");
+					System.out.println("Please Re-enter: ");
+				}
+			}
+			
+			
+			try {
+				TimeSlot timeSlot = new TimeSlot(date, startTime, endTime);
 				
 				//check new input
-				if(!checkConflict(b.getBookingId(), b.getFacilityId(), timeSlot)) {
-					System.out.println("Modified Fail");
+				if(checkConflict(trueBookingId, getFacilityIdByBookingId(trueBookingId), timeSlot)) {
+				
+					trueTimeSlot = timeSlot;
 					break;
 				}
+			}
+			catch(Exception e) {
+				System.out.println("\nFalse Time Format!");
+				System.out.println("Please Re-enter: ");
+			}
+		}		
+		
+		//purpose
+		System.out.print("\nEnter new purpose: ");
+		String purpose = input.nextLine();
+		
+		for(Booking b : bookings) {
+			
+			if(b.getBookingId().equals(trueBookingId)) {
 				
-				LocalDateTime lastModifiedTime = LocalDateTime.now();
+				LocalDateTime lastModifiedTime = LocalDateTime.now().withSecond(0).withNano(0);
 							
-				b.modifyBooking(timeSlot, purpose, lastModifiedTime);
+				b.modifyBooking(trueTimeSlot, purpose, lastModifiedTime);
 							
 				saveBookings();
-							
-				System.out.println("Booking Modified");
 				
-				//stop for loop when found bookingId
+				System.out.println("\nBooking " + trueBookingId + " Modified Successfully.");
+
 				break;
 			}
 		}
-		
-		if(!found) {
-			System.out.println("False bookingId");
-		}
-		
 	}
-	
+		
+	// (case 3) 
 	public void cancelBooking() {
 		
 		String currentUserId = currentUser.getUserId();
 		
 		//bookingId
-		System.out.print("\nEnter bookingId(Ex:B001): ");
-		String bookingId = input.nextLine();
+		String trueBookingId;
 		
-		boolean found = false;
-		
-		for(int i = 0; i < bookings.size(); i++) {
+		while(true) {
 			
-			Booking b = bookings.get(i);
+			boolean privilege = false;
+			boolean found = false;
 			
-			if(b.getBookingId().equals(bookingId)) {
-				
-				found = true;
-				
-				if(!b.getUserId().equals(currentUserId)) {
-					System.out.println("No Privileges to Cancel");
-					break;
-				}
+			System.out.print("\nEnter bookingId(Ex:B001)/(Enter 0 to exit): ");
+			String bookingId = input.nextLine();
+			
+			if (bookingId.equals("0")) {
+				System.out.println("\nExit Cancellation.");
+				return;
+			}
+			
+			if(checkBookingId(bookingId)) {
+			
+				for(Booking b : bookings) {
 					
-				if(!b.canCancel()) {
-					System.out.println("Cannot Cancel");
-					break;
+					if(b.getBookingId().equals(bookingId)) {
+						
+						found = true;
+						
+						if(!b.getUserId().equals(currentUserId)) {
+							System.out.println("\nNo Privileges to Cancel " + bookingId + "!");
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canStatus()) {
+							System.out.println("\nCannot Cancel! (booking " + bookingId + " has already been " 
+						+ b.getStatus().toString().toLowerCase() + ")");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canTime()) {
+							System.out.println("\nCannot Cancel! (booking " + bookingId + " has already passed)");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						break;
+					}
 				}
 				
-				bookings.remove(i);
-						
-				saveBookings();
-						
-				System.out.println("Booking Cancelled");
+				if(!privilege) {
+					return;	// stop this whole method
+				}
 				
-				//stop when found bookingId
-				break;
+				if(found) {
+					trueBookingId = bookingId;
+					break;
+				}
 			}
 		}
 		
-		if(!found) {
-			System.out.println("False bookingId");
+		for(Booking b : bookings) {
+			
+			if(b.getBookingId().equals(trueBookingId)) {
+				
+				b.setStatus(BookingStatus.CANCELLED);
+				
+				saveBookings();
+				
+				System.out.println("\nBooking " + trueBookingId + " Cancelled Successfully.");
+
+				break;
+			}
 		}
-		
 	}
 	
-	public String getStatusByBookingId() {
+	// (case 4)
+	public void showMyBookings(User currentUser){
+		
+		int i = 0;
+		
+		for(Booking b : bookings) {
+			
+			if(b.getUserId().equals(currentUser.getUserId())) {
+				i++;
+				System.out.println(b);
+			}
+		}
+		
+		if(i == 0) {
+			System.out.println("\nYou do not have any booking yet.");
+		}
+		else {
+			System.out.println("\nAll your bookings are shown.");
+		}
+	}
+
+	
+	//admin only (case 5) 
+	public void showAllBookings() {
+		
+		for(Booking b : bookings) {
+			System.out.println(b);
+		}
+		System.out.println("\nAll bookings are shown.");
+	}
+	
+	//admin only (case 6)
+	public void approveBooking() {
 		
 		//bookingId
-		System.out.print("\nEnter bookingId(Ex:B001): ");
-		String bookingId = input.nextLine();
+		String trueBookingId;
 		
-		for(Booking b : bookings) {
+		while(true) {
 			
-			if(b.getBookingId().equals(bookingId)) {
+			boolean privilege = false;
+			boolean found = false;
+			
+			System.out.print("\nEnter bookingId(Ex:B001)/(Enter 0 to exit): ");
+			String bookingId = input.nextLine();
+			
+			if (bookingId.equals("0")) {
+				System.out.println("\nExit Approval.");
+				return;
+			}
+			
+			if(checkBookingId(bookingId)) {
+			
+				for(Booking b : bookings) {
+					
+					if(b.getBookingId().equals(bookingId)) {
+						
+						found = true;
+						
+						if(!b.canStatus()) {
+							System.out.println("\nCannot Approved! (booking " + bookingId + " has already been " 
+						+ b.getStatus().toString().toLowerCase() + ")");
+							
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canTime()) {
+							System.out.println("\nCannot Approved! (booking " + bookingId + " has already passed)");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						break;
+					}
+				}
 				
-				return "Status: " + b.getStatus();
+				if(!privilege) {
+					return;	// stop this whole method
+				}
 				
-				//when return occur, (loop + this method) will stop
+				if(found) {
+					trueBookingId = bookingId;
+					break;
+				}
 			}
 		}
-		//so if loop have return, this method will not run to here
-		return "False bookingId";
-	}
-	
-	public ArrayList<Booking> getBookingsByUserId(){
-	
-		//userId
-		System.out.print("\nEnter userId(Ex:U001): ");
-		String userId = input.nextLine();
-		
-		ArrayList<Booking> result = new ArrayList<>();
 		
 		for(Booking b : bookings) {
 			
-			if(b.getUserId().equals(userId)) {
+			if(b.getBookingId().equals(trueBookingId)) {
 				
-				result.add(b);
-			}
-		}
-		
-		if(result.isEmpty()) {
-			System.out.println("False userId");
-		}
-		
-		return result;
-	}
-	
-	//admin only
-	public void approveBooking(String bookingId) {
-		
-		boolean found = false;
-		
-		for(Booking b : bookings) {
-			
-			if(b.getBookingId().equals(bookingId)) {
+				b.setStatus(BookingStatus.APPROVED);
 				
-				found = true;
-				
-				b.setStatus("APPROVED");
 				saveBookings();
-				System.out.println("Booking Approved");
 				
-				break;
-			}	
-		}
-		if(!found) {
-			System.out.println("False bookingId");
-		}
-	}
-	
-	//admin only
-	public void rejectBooking(String bookingId) {
-		
-		boolean found = false;
-		
-		for(Booking b : bookings) {
-			if(b.getBookingId().equals(bookingId)) {
-				
-				found = true;
-				
-				b.setStatus("REJECTED");
-				saveBookings();
-				System.out.println("Booking Rejected");
-				
-				break;
-			}
-		}
-		if(!found) {
-			System.out.println("False bookingId");
-		}
-	}
-	
-	
-	public boolean checkConflict(String bookingId, String facilityId, TimeSlot timeSlot) {
+				System.out.println("\nBooking " + trueBookingId + " Approved.");
 
+				break;
+			}
+		}
+	}
+		
+	
+	
+	//admin only (case 7)
+	public void rejectBooking() {
+
+		//bookingId
+		String trueBookingId;
+		
+		while(true) {
+			
+			boolean privilege = false;
+			boolean found = false;
+			
+			System.out.print("\nEnter bookingId(Ex:B001)/(Enter 0 to exit): ");
+			String bookingId = input.nextLine();
+			
+			if (bookingId.equals("0")) {
+				System.out.println("\nExit Rejection.");
+				return;
+			}
+			
+			if(checkBookingId(bookingId)) {
+			
+				for(Booking b : bookings) {
+					
+					if(b.getBookingId().equals(bookingId)) {
+						
+						found = true;
+						
+						if(!b.canStatus()) {
+							System.out.println("\nCannot Rejected! (booking " + bookingId + " has already been " 
+						+ b.getStatus().toString().toLowerCase() + ")");
+							
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						if(!b.canTime()) {
+							System.out.println("\nCannot Rejected! (booking " + bookingId + " has already passed)");
+							privilege = false;
+							break;
+						}
+						else {
+							privilege = true;
+						}
+						
+						break;
+					}
+				}
+				
+				if(!privilege) {
+					return;	// stop this whole method
+				}
+				
+				if(found) {
+					trueBookingId = bookingId;
+					break;
+				}
+			}
+		}
+		
+		for(Booking b : bookings) {
+			
+			if(b.getBookingId().equals(trueBookingId)) {
+				
+				b.setStatus(BookingStatus.REJECTED);
+				
+				saveBookings();
+				
+				System.out.println("\nBooking " + trueBookingId + " Rejected.");
+
+				break;
+			}
+		}
+	}
+	
+	
+	public boolean checkFacilityId(String facilityId) {
+		
 		boolean found = false;
 		
 		//check the input facilityId in the storage or not
@@ -309,42 +679,116 @@ public class BookingManager{
 				
 				found = true;
 				break;
-			}//else skip
+			}
 		}
 		
 		if(!found) {	//the input facilityId not in the storage = false
-			System.out.println("False facilityId");
+			System.out.println("\nFalse facilityId!");
 			return false;
 		}
+		else {
+			return true;
+		}
 		
-		//else if(found) {
+	}
+	
+	public boolean checkBookingId(String bookingId) {
+		
+		boolean found = false;
+		
 		for(Booking b : bookings) {
+			
+			if(b.getBookingId().equals(bookingId)) {
+				
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found) {
+			System.out.println("\nFalse bookingId!");
+			System.out.println("Please Re-enter: ");
+			return false;
+		}
+		else {
+			return true;
+		}
+		
+	}
+	
+	
+	public boolean checkConflict(String bookingId, String facilityId, TimeSlot timeSlot) {
+	
+		for(Booking b : bookings) {
+			
+			//just check PENDING & APPROVED
+			if(b.getStatus().equals(BookingStatus.REJECTED) || b.getStatus().equals(BookingStatus.CANCELLED)) {
+				
+				continue;	//= skip this b, loops next again
+			}
 			
 			//skip when modify, 
 			//because new time maybe will conflict the old(actually will be replace)
-			if(bookingId != null && !bookingId.isEmpty() && 
-					b.getBookingId().equals(bookingId)) {
+			if(bookingId != null && b.getBookingId().equals(bookingId)) {
 				continue;	//= skip
 			}
-				
+			
+			//skip when different facility
+			if(!b.getFacilityId().equals(facilityId)) {
+				continue;
+			}
+			
+			//check when same facility
 			if(b.getFacilityId().equals(facilityId)) {
 				
 				if(b.getTimeSlot().overlaps(timeSlot)) {
+					System.out.println("\nTime Conflict!");
+					System.out.println("Please Re-enter: ");
 					return false;
 				}
 			}
 		}
-			
-		System.out.println("No Conflict");
+		
+		System.out.println("\nNo Time Conflict Detected");
 		return true;
 		
+	}
+
+	
+	public String getFacilityIdByBookingId(String bookingId) {
+		
+		for(Booking b : bookings) {
+			
+			if(b.getBookingId().equals(bookingId)) {
+				
+				return b.getFacilityId();
+				
+				//when return occur, (loop + this method) will stop
+			}
+		}
+		
+		//if not found
+		return null;
+	}
+	
+	
+	public int getUserBookingStatistics(String userId) {
+		
+		int count = 0;
+		
+		for(Booking b : bookings) {
+			if(b.getUserId().equals(userId)) {
+				count++;
+			}
+		}
+		return count;
 	}
 	
 	public ArrayList<Booking> getUpcomingBookings(){
 		
 		ArrayList<Booking> result = new ArrayList<>();
 		
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
 		
 		for(Booking b : bookings) {
 			
@@ -431,18 +875,6 @@ public class BookingManager{
 		System.out.println("\n=================================");
 	}
 	
-	public int getUserBookingStatistics(String userId) {
-		
-		int count = 0;
-		
-		for(Booking b : bookings) {
-			if(b.getUserId().equals(userId)) {
-				count++;
-			}
-		}
-		return count;
-	}
-	
 	
 	public void loadFacilities() {
 		
@@ -464,6 +896,7 @@ public class BookingManager{
 		
 		bookingStorage.save(bookings);
 	}
+	
 	
 }
 

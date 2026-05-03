@@ -25,20 +25,25 @@ public class TimeSlot {
 	public boolean overlaps(TimeSlot timeSlot) {
 		
 		if (timeSlot == null) 
-			return this.date.equals(timeSlot.date) &&
-					this.startTime.isBefore(timeSlot.endTime) &&
-					timeSlot.startTime.isBefore(this.endTime);
+			return false;
+		
+		return this.date.equals(timeSlot.date) &&
+			       this.startTime.isBefore(timeSlot.endTime) &&
+			       timeSlot.startTime.isBefore(this.endTime);
+
 	}
 
 	// getters
 	public LocalDate getDate() { 
 		return date; 
 	}
+	
 	public LocalTime getStartTime() { 
 		return startTime; 
 	}
+	
 	public LocalTime getEndTime() { 
 		return endTime; 
 	}
-
+	
 }
