@@ -2,9 +2,13 @@ package storage;
 
 import java.io.*;
 import java.util.*;
+
+import booking.BookingStatus;
+
 import java.time.LocalDate;
 
 import maintenance.MaintenanceReport;
+import maintenance.MaintenanceStatus;
 
 public class MaintenanceStorage extends BaseStorage{
 
@@ -38,7 +42,7 @@ public class MaintenanceStorage extends BaseStorage{
 				LocalDate endDate = p[7].equals("NULL") || p[7].isEmpty()
 						? null
 						: LocalDate.parse(p[7]);
-				String status=p[8];
+				MaintenanceStatus status = MaintenanceStatus.valueOf(p[8].toUpperCase());
 				String priority=p[9];
 				
 				MaintenanceReport report = new MaintenanceReport(reportId,facilityId,reportedBy,assignedTo,

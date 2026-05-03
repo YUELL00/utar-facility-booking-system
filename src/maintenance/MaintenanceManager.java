@@ -289,7 +289,7 @@ public class MaintenanceManager {
 		
 		}
 		
-		System.out.println("Frequent Issues:");
+		System.out.println("\nFrequent Issues:");
 
 		for (Map.Entry<String, Integer> entry : issueCount.entrySet()) {
 			System.out.println(entry.getKey() + " : " + entry.getValue());
