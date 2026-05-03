@@ -8,6 +8,7 @@ import storage.*;
 import user.*;
 import java.util.*;
 import java.time.LocalDate;
+import java.time.temporal.*;
 import storage.MaintenanceStorage;
 
 public class MaintenanceManager {
@@ -60,6 +61,30 @@ public class MaintenanceManager {
 		else {
 			return true;
 		}
+		
+	}
+	
+	public boolean checkReportId(String reportId) {
+			
+		boolean found = false;
+			
+			//check the input reportId in the storage or not
+			for(MaintenanceReport r : reports) {
+				
+				if(r.getReportId().equals(reportId)) {
+					
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {	//the input facilityId not in the storage = false
+				System.out.println("No such a ReportId is found");
+				return false;
+			}
+			else {
+				return true;
+			}
 		
 	}
 	
@@ -132,17 +157,38 @@ public class MaintenanceManager {
 		}while(choice < 0 && choice > 2);
 	}
 	
-	public void assignMaintenance(String reportId, String userId) {//WIP
+	public void assignMaintenance() {//WIP
 		MaintenanceReport report = null;
 		int i = 0;  
 		String currentUserId = currentUser.getUserId();
 		int choice;
-		for(MaintenanceReport r : reports) {
-			if(r.getReportId().equals(reportId)) {
-				report = r;
-				break;
-			}else {
-				i++;
+		String reportId;
+		while(true) {
+			boolean found = false;
+			
+			System.out.print("Enter report id(Ex:R001)/(Enter 0 to exit): ");
+			reportId = input.nextLine();
+			
+			if (reportId.equals("0")) {
+				System.out.println("\nExit...");
+				return;
+			}
+			
+			if(checkReportId(reportId)) {
+				
+				for(MaintenanceReport r : reports) {
+				
+					if(r.getReportId().equals(reportId)) {
+			
+						found = true;
+						break;
+					}
+				}
+				
+				if(!found) {
+					System.out.println("No report found");
+					break;
+				}			
 			}
 		}
 		
@@ -175,19 +221,30 @@ public class MaintenanceManager {
 		//end
 	}
 	
-	public void updateMaintenanceStatus(String reportId, String status) {
+	public void updateMaintenanceStatus() {
 		MaintenanceReport report = null;
 		int i = 0;  
-		while(i < reports.size()) {  
-			report = reports.get(i); 
-			if(report.getReportId().equals(reportId)) { 
-				report.updateTaskStatus(status);
-				reports.set(i, report);
-				break;
-			}else { 
-				i++;
-			} 
-		} 
+		String currentUserId = currentUser.getUserId();
+		int choice;
+		String reportId;
+		do {
+			System.out.println("Enter report id (ex:R001): ");
+			reportId = input.nextLine();
+			if(checkReportId(reportId)) {
+				for(MaintenanceReport r : reports) {
+					if(r.getReportId().equals(reportId)) {
+						report = r;
+						break;
+					}else {
+						i++;
+					}
+				}
+			}else {
+				System.out.println("Please Re-enter: ");
+			}
+		}while(!checkReportId(reportId));
+		
+		
 	}
 	
 	public void getMaintenanceHistory(User currentUser){
@@ -215,69 +272,63 @@ public class MaintenanceManager {
 	}
 	
 	public void getFrequentIssues() {//WIP
-	    Map<String, Integer> wordCount = new HashMap<>();
+		Map<String, Integer> issueCount = new HashMap<>();
 	    
-	    Set<String> stopWords = Set.of("the", "is", "and", "a", "to", "of", "in", "on");
+		Set<String> stopWords = Set.of("the", "a", "an");
 	    
-		for(MaintenanceReport r : reports) {
-			String desc = r.getDescription().toLowerCase();
-	        
-	        String[] words = desc.split("\\W+"); // 按非字母分割
-	        
-	        for (String word : words) {
-	            if (word.isEmpty() || stopWords.contains(word)) {
-	            	continue;
-	            }
+		for (MaintenanceReport r : reports) {
+		    String desc = r.getDescription().toLowerCase();
+		    String[] words = desc.split("\\W+");
 
-	            wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
-	        }
+		    for (String word : words) {
+		        if (!stopWords.contains(word)) {
+		            issueCount.put(word, issueCount.getOrDefault(word, 0) + 1);
+		            break;
+		        }
+		    }
+		
 		}
 		
 		System.out.println("Frequent Issues:");
 
-		for (Map.Entry<String, Integer> entry : wordCount.entrySet()) {
-				System.out.println(entry.getKey() + " : " + entry.getValue());
+		for (Map.Entry<String, Integer> entry : issueCount.entrySet()) {
+			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
 	}
 	
 	public void generateMaintenanceReport() { //generate maintenance performance report
-		
-		if(currentUser.getRole().equals("Admin")) {
-			
-		}else {
-			
-		}
-		 //count
-		int assign = 0;
-		int inProgress = 0;
-		int complete = 0;
-		int reject = 0;
+		double i = 0.0;
+		double days = 0.0;
+		double average = 0.0;
+		Map<String, Integer> facilityCount = new HashMap<>();
 		
 		for(MaintenanceReport r : reports) {
-			switch(r.getStatus()) {
-			case "ASSIGNED":
-				assign++;
-				break;
-			case "IN_PROGRESS":
-				inProgress++;
-				break;
-			case "COMPLETED":
-				complete++;
-				break;
-			case "REJECTED":
-				reject++;
-				break;
+			if(!r.getStatus().equals(MaintenanceStatus.REJECTED)) {
+				facilityCount.put(r.getFacilityId(), facilityCount.getOrDefault(r, 0) + 1);
 			}
 		}
-		System.out.println("=== Maintenance Preformance Report ===");
-		System.out.println("Assigned Task: " + assign);
-		System.out.println("Rejected Task: " + reject);
-		System.out.println("Task In Progress: " + inProgress);
-		System.out.println("Completed Task: " + complete);
+		
+		for(MaintenanceReport r : reports) {
+			if(r.isCompleted()) {
+				days += ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
+				i++;
+			}
+		}
+		
+		average = days / i;
+		
+		System.out.println("=== Maintenance Performance Report ===\n");
+		System.out.println("Number of Maintenance Cases per Facilitiy: ");
+		for (Map.Entry<String, Integer> entry : facilityCount.entrySet()) {
+	        System.out.println(entry.getKey() + " : " + entry.getValue());
+	    }
 		
 		getFrequentIssues();
-		//WIP
-
+		
+		System.out.println("\nTotal Maintenance Cases: " + reports.size());
+		System.out.println("\nAverage Repair Time (day): " + average);
+		
+		System.out.println("\n=================================");
 	}
 	
 	public void loadReports() {
