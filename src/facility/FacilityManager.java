@@ -31,6 +31,17 @@ public class FacilityManager {
 	    facilityStorage.save(new ArrayList<>(facilities));
 	}
 	
+	public List<Facility> findFacilities(String typeInput) {
+		List<Facility> result = new ArrayList<>();
+		
+		for (Facility f : facilities) {
+			if (typeInput.equals("1") || f.getFacilityType().equalsIgnoreCase(typeInput)) {
+				result.add(f);
+			}
+		}
+		return result;
+	}
+	
 	// search facility
 	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end, 
 											String type, BookingManager bookingManager) {

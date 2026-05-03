@@ -1,5 +1,6 @@
 package main;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
@@ -377,25 +378,101 @@ public class MainSystem {
 
 	// Facility
 	private void handleFacilitySearch() {
-
-		System.out.print("Date (yyyy-mm-dd): ");
-		String date = scanner.nextLine();
-
-		System.out.print("Start time (HH:mm): ");
-		LocalTime start = LocalTime.parse(scanner.nextLine());
-
-		System.out.print("End time (HH:mm): ");
-		LocalTime end = LocalTime.parse(scanner.nextLine());
-
-		System.out.print("Type: ");
-		String type = scanner.nextLine();
-
-		List<Facility> result = facilityManager.searchFacilities(date, start, end, type, bookingManager);
-
-		if (result.isEmpty()) {
-			System.out.println("No available facilities found.");
-		} else {
-			result.forEach(System.out::println);
+		System.out.println("\n======= Facility Search =======");
+		List<Facility> selectedList;
+		
+		// ===== Step 1: choose type =====
+		while (true) {
+			
+			System.out.print("Enter facility type (or 1 to view list): ");
+			String input = scanner.nextLine();
+			
+			List<Facility> result = facilityManager.findFacilities(input);
+			
+			if (result.isEmpty()) {
+				System.out.println("No facility found.");
+				continue;
+			}
+			
+			if (input.equals("1")) {
+				printFacilityList(result);
+				continue;
+			}
+			
+			printFacilityList(result);
+			selectedList = result;
+			break;
+		}
+		
+		// ===== Step 2: keyin type =====
+		
+		String dateStr;
+		LocalDate date;
+		
+		while (true) {
+			System.out.print("Date (yyyy-mm-dd): ");
+			dateStr = scanner.nextLine();
+			
+			if (!Validator.validateDate(dateStr)) {
+				System.out.println("Invalid date format.");
+				continue;
+			}
+			
+			date = LocalDate.parse(dateStr);
+			break;
+		}
+		
+		String startStr;
+		String endStr;
+		LocalTime start;
+		LocalTime end;
+		while (true) {
+			System.out.print("Start time (HH:mm): ");
+			startStr = scanner.nextLine();
+			    
+			System.out.print("End time (HH:mm): ");
+			endStr = scanner.nextLine();
+				
+			if (!Validator.validateTimeSlot(startStr, endStr)) {
+				System.out.println("Invalid time slot.");
+				continue;
+			}
+			
+			start = LocalTime.parse(startStr);
+			end = LocalTime.parse(endStr);
+			break;
+		}
+		
+		TimeSlot ts = new TimeSlot(date, start, end);
+		
+		// ===== Step 3: check facility =====
+		System.out.println("\nAvailable Facilities:");
+		
+		boolean found = false;
+		
+		for (Facility f : selectedList) {
+			
+			if (!f.checkAvailability()) continue;
+			if (bookingManager.isBooked(f.getFacilityId(), ts)) continue;
+			
+			System.out.println("- " + f.getFacilityName());
+			found = true;
+		}
+		
+		if (!found) {
+			System.out.println("No available facilities for this time slot.");
+		}
+	}
+	
+	private void printFacilityList(List<Facility> list) {
+		System.out.println("\n===== Facility List =====");
+		
+		System.out.printf("%-5s %-20s %-15s\n", "No.", "Name", "Type");
+		System.out.println("------------------------------------------");
+		
+		int i = 1;
+		for (Facility f : list) {
+			System.out.printf("%-5d %-20s %-15s\n", i++, f.getFacilityName(), f.getFacilityType());
 		}
 	}
 
