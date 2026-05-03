@@ -690,9 +690,12 @@ public class MainSystem {
 	// Notification
 	public void checkUpcomingBookings() {
 
-		for (Booking b : bookingManager.getUpcomingBookings()) {
+		for (Booking b : bookingManager.getUpcomingBookings(currentUser)) {
 			String msg = notificationService.generateBookingReminder(b);
-			System.out.println(msg);
+			
+			if(msg != null) {
+				System.out.println(msg);
+			}
 		}
 	}
 

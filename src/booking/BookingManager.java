@@ -784,7 +784,7 @@ public class BookingManager{
 		return count;
 	}
 	
-	public ArrayList<Booking> getUpcomingBookings(){
+	public ArrayList<Booking> getUpcomingBookings(User user){
 		
 		ArrayList<Booking> result = new ArrayList<>();
 		
@@ -792,14 +792,33 @@ public class BookingManager{
 		
 		for(Booking b : bookings) {
 			
-			LocalDateTime startTime = LocalDateTime.of(
-					b.getTimeSlot().getDate(), 
-					b.getTimeSlot().getStartTime());
+			// user filter
+			if (!b.getUserId().equals(user.getUserId()))
+				continue;
 			
-			//current booking within 12 hour
-			if(startTime.isAfter(now) && 
-					startTime.isBefore(now.plusHours(12))) {
+			// if cancelled
+			if (b.getStatus() == BookingStatus.CANCELLED)
+				continue;
+			
+			// if rejected
+			if (b.getStatus() == BookingStatus.REJECTED) {
 				result.add(b);
+				continue;
+			}
+			
+			// if approved
+			if (b.getStatus() == BookingStatus.APPROVED) {
+			
+				// time validation
+				LocalDateTime startTime = LocalDateTime.of(
+						b.getTimeSlot().getDate(), 
+						b.getTimeSlot().getStartTime());
+				
+				//current booking within 12 hour
+				if(startTime.isAfter(now) && 
+						startTime.isBefore(now.plusHours(12))) {
+					result.add(b);
+				}
 			}
 		}
 		
