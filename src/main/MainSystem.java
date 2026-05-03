@@ -122,7 +122,7 @@ public class MainSystem {
 		while (true) {
 			System.out.println("Note: Admin accounts cannot be registered manually, ");
 			System.out.println("Only Student and Staff accounts can be registered, ");
-			System.out.println("Please select either Student or Staff. \n");
+			System.out.println("Please enter 'Student' or 'Staff' to select the role. \n");
 			System.out.print("Role: ");
 			role = scanner.nextLine();
 			
