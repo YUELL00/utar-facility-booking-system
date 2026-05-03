@@ -48,7 +48,7 @@ public class Validator {
 	}
 
 	public static boolean validateContactNumber(String contact) {
-		if (contact.length() != 11) 
+		if (contact.length() != 10 | contact.length() != 11) 
 			return false;
 		
 		for (int i = 0; i < contact.length(); i++) {
