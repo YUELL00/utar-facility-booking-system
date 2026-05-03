@@ -9,6 +9,11 @@ public class MaintenanceReport {
 		return reportId;
 	}
 	
+	private String feedbackId;
+	public String getFeedbackId() {
+		return feedbackId;
+	}
+	
 	private String facilityId;
 	public String getFacilityId() {
 		return facilityId;
@@ -44,8 +49,8 @@ public class MaintenanceReport {
 		return endDate;
 	}
 	
-	private String status;
-	public String getStatus() {
+	private MaintenanceStatus status;
+	public MaintenanceStatus getStatus() {
 		return status;
 	}
 	
@@ -55,8 +60,7 @@ public class MaintenanceReport {
 	}
 	
 	//constructor
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, 
-			String description, LocalDate reportDate, LocalDate startDate, LocalDate endDate, String status, String priority) {
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, LocalDate reportDate, LocalDate startDate, LocalDate endDate, MaintenanceStatus status, String priority) {
 		this.reportId = reportId;
 		this.facilityId = facilityId;
 		this.reportedByUserId = reportedByUserId;
@@ -69,7 +73,15 @@ public class MaintenanceReport {
 		this.priority = priority;
 	}
 	
-	public void updateTaskStatus(String status) {
+	//Feedback
+	public MaintenanceReport(String feedbackId, String facilityId, String reportedByUserId, String description, LocalDate reportDate) {
+		this.feedbackId = feedbackId;
+		this.facilityId = facilityId;
+		this.reportedByUserId = reportedByUserId;
+		this.description = description;
+		this.reportDate = reportDate;
+	}
+	public void updateTaskStatus(MaintenanceStatus status) {
 		this.status = status;
 	}
 	
