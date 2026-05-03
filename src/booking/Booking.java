@@ -45,7 +45,7 @@ public class Booking {
 		this.status = status;
 	}
 
-	public boolean canModify() {
+	public boolean canStatus() {
 		if(status.equals(BookingStatus.PENDING)) {
 			return true;
 		}
@@ -54,7 +54,7 @@ public class Booking {
 		}
 	}
 	
-	public boolean canCancel() {
+	public boolean canTime() {
 		
 		// get current/now date + time
 		LocalDateTime now = LocalDateTime.now();

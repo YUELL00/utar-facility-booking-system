@@ -368,13 +368,14 @@ public class MainSystem {
 			System.out.println("1. Create Booking");
 			System.out.println("2. Modify Booking");
 			System.out.println("3. Cancel Booking");
+			System.out.println("4. Show My Bookings");
 			
 			//check admin role
 			if(user.getRole().equals("Admin")) {
 				
-				System.out.println("4. Show All Bookings");
-				System.out.println("5. Approve Booking");
-				System.out.println("6. Reject Booking");
+				System.out.println("5. Show All Bookings");
+				System.out.println("6. Approve Booking");
+				System.out.println("7. Reject Booking");
 			}
 			System.out.println("0. Back");
 		
@@ -399,6 +400,11 @@ public class MainSystem {
 					break;
 				
 				case 4:
+					System.out.println("\nShow My Bookings...\n");
+					bookingManager.showMyBookings(currentUser);
+					break;
+					
+				case 5:
 					if(user.getRole().equals("Admin")) {
 						System.out.println("\nShow All Bookings...\n");
 						bookingManager.showAllBookings();
@@ -408,7 +414,7 @@ public class MainSystem {
 						break;
 					}
 				
-				case 5:
+				case 6:
 					if(user.getRole().equals("Admin")) {
 						System.out.println("\nApprove Booking...");
 						bookingManager.approveBooking();
@@ -418,7 +424,7 @@ public class MainSystem {
 						break;
 					}
 					
-				case 6:
+				case 7:
 					if(user.getRole().equals("Admin")) {
 						System.out.println("\nReject Booking...");
 						bookingManager.rejectBooking();
