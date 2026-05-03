@@ -139,6 +139,17 @@ public class UserManager {
 		System.out.println("Profile updated.");
 	}
 	
+	public void updatePassword(User user, String newPassword){
+
+		if(user == null) {
+			System.out.println("User not found.");
+			return;
+		}
+		
+		user.setPassword(newPassword);
+		saveUsers();
+	}
+	
 	public void loadUsers(){
 		users.clear();
 		// load all users to memory

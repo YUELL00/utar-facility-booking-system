@@ -340,13 +340,18 @@ public class MainSystem {
 			System.out.println("\n======= My Profile =======");
 			currentUser.viewProfile();
 			
-			System.out.println("\nEnter 1 to Edit Contact.\nEnter 0 to Back.");
+			System.out.println("\nEnter 1 to Edit Contact.");
+			System.out.println("Enter 2 to Reset Password.");
+			System.out.println("Enter 0 to Back.");
 			
 			int choice = getMenuChoice();
 			
 			switch (choice) {
 				case 1:
 					editContact();
+					break;
+				case 2:
+					resetPassword();
 					break;
 				case 0:
 					return;
@@ -374,6 +379,53 @@ public class MainSystem {
 			userManager.updateUser(currentUser, newContact);
 			break;
 		}
+	}
+	
+	private void resetPassword() {
+
+		// Validate current password
+		System.out.print("Enter current password: ");
+		String oldPassword = scanner.nextLine();
+
+		if (!currentUser.getPassword().equals(oldPassword)) {
+			System.out.println("Incorrect password.");
+			return;
+		}
+
+		// Validate new password
+		String newPassword;
+		String confirmPassword;
+
+		while (true) {
+			System.out.print("Enter new password: ");
+			newPassword = scanner.nextLine();
+	
+			String err = userManager.validatePassword(newPassword);
+			if (err != null) {
+				System.out.println(err);
+				continue;
+			}
+	
+			System.out.print("Confirm new password: ");
+			confirmPassword = scanner.nextLine();
+	
+			if (!newPassword.equals(confirmPassword)) {
+				System.out.println("Passwords do not match.");
+			continue;
+			}
+			
+			if (newPassword.equals(oldPassword)) {
+				System.out.println("New password cannot be same as old password.");
+				continue;
+			}
+	
+			break;
+		}
+
+		// Update
+		userManager.updatePassword(currentUser, newPassword);
+		
+		System.out.println("Password updated successfully.");
 	}
 
 	// Facility

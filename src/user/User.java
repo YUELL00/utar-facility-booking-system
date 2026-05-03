@@ -41,6 +41,10 @@ public abstract class User {
 		this.contactNumber = contactNumber;
 	}
 	
+	public void setPassword(String password){
+		this.password = password;
+	}
+	
 	public abstract String getRole();
 	
 	// show the student information
