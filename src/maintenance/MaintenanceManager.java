@@ -5,10 +5,22 @@ import java.util.*;
 import storage.*;
 import user.*;
 public class MaintenanceManager {
-	private ArrayList<MaintenanceReport> reports;
-	private int size;
-	private MaintenanceStorage maintenanceStorage;
 	Scanner input = new Scanner(System.in);
+	
+	private ArrayList<MaintenanceReport> reports;
+	
+	private MaintenanceStorage maintenanceStorage;
+	
+	private int size;
+	
+	//constructor
+	public MaintenanceManager(){
+		this.reports = new ArrayList<>();
+		
+		this.maintenanceStorage = new MaintenanceStorage("D:\\MaintenanceStorage.txt");
+		
+		loadReports();
+	}
 	
 	public void createMaintenanceReport() { //feedback
 		String status, choice, description;
@@ -167,15 +179,36 @@ public class MaintenanceManager {
 		System.out.println("Frequent Issues:");
 
 		for (Map.Entry<String, Integer> entry : wordCount.entrySet()) {
-		        System.out.println(entry.getKey() + " : " + entry.getValue());
+				System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
 	}
 	
 	public void generateMaintenanceReport() { //generate maintenance performance report
+		 //count
 		int assign = 0;
 		int inProgress = 0;
 		int complete = 0;
-		int reject = 0; //count
+		int reject = 0;
+		
+		int choice;
+		//Choose Time Range
+		System.out.println("===Time Range===");
+		System.out.println("1. Monthly");
+		System.out.println("2. Semester");
+		System.out.println("3. Yearly");
+		do {
+			System.out.println("Enter Your Choice: ");
+			choice = input.nextInt();
+			switch(choice) {
+			case 1:
+				
+			case 2:
+			
+			case 3:
+				
+			}
+		}while(choice <=1 && choice >=3);
+		
 		for(MaintenanceReport r : reports) {
 			switch(r.getStatus()) {
 			case "ASSIGNED":
@@ -202,28 +235,15 @@ public class MaintenanceManager {
 	}
 	
 	
-	public void loadReports() { //WIP
-		int[] countB = new int[1];
-		
-		//array <-- file
-		MaintenanceReport[] listB = MaintenanceStorage.load(countB);
+	public void loadReports() {
 		
 		reports.clear();
 		
-		for(int i = 0; i < countB[0]; i++) {
-			reports.add(listB[i]);
-			size++;
-		}
+		reports = maintenanceStorage.load();
 	}
+	
 	public void saveReports() {
-		MaintenanceReport[] arr = new MaintenanceReport[size];
-		
-		for(int i = 0; i < size; i++) {
-			arr[i] = reports.get(i);
-		}
-		
-		maintenanceStorage.save(reports,size);
+		maintenanceStorage.save(reports);
 	}
-
-
 }
+

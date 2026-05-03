@@ -37,7 +37,7 @@ public class MaintenanceReport {
 	public String getStatus() {
 		return status;
 	}
-	
+
 	//constructor
 	//Maintenance Report
 	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, String reportDate, String startDate, String endDate, String status) {
