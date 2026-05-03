@@ -66,7 +66,7 @@ public class UserManager {
 	
 	public String validateContact(String contact) {
 		if (!Validator.validateContactNumber(contact)) {
-			return "Invalid contact number. Must be 11-digit Malaysian phone number.";
+			return "Invalid contact number. Must be 10 or 11-digit Malaysian phone number.";
 		}
 		return null;
 	}
