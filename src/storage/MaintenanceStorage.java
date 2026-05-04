@@ -30,23 +30,30 @@ public class MaintenanceStorage extends BaseStorage{
 					continue;
 				}
 		
-				String reportId=p[0];
-				String facilityId=p[1];
-				String reportedBy=p[2];
-				String assignedTo=p[3];
-				String description=p[4];
-				LocalDate reportDate = LocalDate.parse(p[5]);
-				LocalDate startDate = p[6].equals("NULL") || p[6].isEmpty()
-						? null
-						: LocalDate.parse(p[6]);
-				LocalDate endDate = p[7].equals("NULL") || p[7].isEmpty()
-						? null
-						: LocalDate.parse(p[7]);
-				MaintenanceStatus status = MaintenanceStatus.valueOf(p[8].toUpperCase());
-				String priority=p[9];
+				String reportId = p[0];
+				String facilityId = p[1];
+				String reportedBy = p[2];
+				String assignedTo = p[3];
+				String technicianName = p[4];
+				String description = p[5];
+				LocalDate reportDate = LocalDate.parse(p[6]);
+				LocalDate startDate;
+				if (p[7].equals("null") || p[7].equals("NULL") || p[7].isEmpty()) {
+					startDate = null;
+				} else {
+					startDate = LocalDate.parse(p[7]);
+				}
+				LocalDate endDate;
+				if (p[7].equals("null") || p[8].equals("NULL") || p[8].isEmpty()) {
+					endDate = null;
+				} else {
+					endDate = LocalDate.parse(p[8]);
+				}
+				MaintenanceStatus status = MaintenanceStatus.valueOf(p[9].toUpperCase());
+				String priority=p[10];
 				
 				MaintenanceReport report = new MaintenanceReport(reportId,facilityId,reportedBy,assignedTo,
-											description,reportDate,startDate,endDate,status,priority);
+											technicianName,description,reportDate,startDate,endDate,status,priority);
 				
 				list.add(report);
 			}
@@ -66,16 +73,38 @@ public class MaintenanceStorage extends BaseStorage{
 			
 			for(MaintenanceReport r : list){
 
-				
-				String line = r.getReportId()+","+
-				r.getFacilityId()+","+
-				r.getReportedByUserId()+","+
-				r.getAssignedByUserId()+","+
-				r.getDescription()+","+
-				r.getReportDate()+","+
-				(r.getStartDate() == null ? "NULL" : r.getStartDate()) + ","+
-				(r.getEndDate() == null ? "NULL" : r.getEndDate()) + ","+
-				r.getStatus()+","+
+				String startDateStr;
+				if (r.getStartDate() == null) {
+					startDateStr = "NULL";
+				} else {
+					startDateStr = r.getStartDate().toString();
+				}
+
+				String endDateStr;
+				if (r.getEndDate() == null) {
+				endDateStr = "NULL";
+				} else {
+					endDateStr = r.getEndDate().toString();
+				}
+
+				String technicianName;
+				if (r.getTechnicianName() == null || r.getTechnicianName().isEmpty()) {
+					technicianName = "NULL";
+				} else {
+					technicianName = r.getTechnicianName();
+				}
+
+				String line =
+				r.getReportId() + "," +
+				r.getFacilityId() + "," +
+				r.getReportedByUserId() + "," +
+				r.getAssignedByUserId() + "," +
+				technicianName + "," +
+				r.getDescription() + "," +
+				r.getReportDate() + "," +
+				startDateStr + "," +
+				endDateStr + "," +
+				r.getStatus() + "," +
 				r.getPriority();
 				
 				writer.println(line);

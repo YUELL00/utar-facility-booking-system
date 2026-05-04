@@ -59,12 +59,18 @@ public class MaintenanceReport {
 		return priority;
 	}
 	
+	private String technicianName;
+	public String getTechnicianName() {
+		return technicianName;
+	}
+	
 	//constructor
-	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String assignedByUserId, String description, LocalDate reportDate, LocalDate startDate, LocalDate endDate, MaintenanceStatus status, String priority) {
+	public MaintenanceReport(String reportId, String facilityId, String reportedByUserId, String technicianName, String assignedByUserId, String description, LocalDate reportDate, LocalDate startDate, LocalDate endDate, MaintenanceStatus status, String priority) {
 		this.reportId = reportId;
 		this.facilityId = facilityId;
 		this.reportedByUserId = reportedByUserId;
 		this.assignedByUserId = assignedByUserId;
+		this.technicianName = technicianName;
 		this.description = description;
 		this.reportDate = reportDate;
 		this.startDate = startDate;
@@ -90,13 +96,17 @@ public class MaintenanceReport {
 		this.endDate = endDate;
 	}
 	
+	public void setTechnicianName(String name) {
+		this.technicianName = name;
+	}
+	
 	public void updateTaskStatus(MaintenanceStatus status) {
 		this.status = status;
 	}
 	
-	public void assignTo(String userId) {
-		//WIP
-		this.assignedByUserId = userId;
+	public void assignTo(String adminId, String technicianName) {
+		this.assignedByUserId = adminId;
+		this.technicianName = technicianName;
 	}
 	
 	public boolean isCompleted() { //WIP 

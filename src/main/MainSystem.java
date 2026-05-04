@@ -638,11 +638,11 @@ public class MainSystem {
 			break;
 			
 			case 3:
-			maintenanceManager.assignMaintenance();
+			handleAssignMaintenance();
 			break;
 			
 			case 4:
-			maintenanceManager.updateMaintenanceStatus();
+			handleCompleteMaintenance();
 			
 			default:
 			break;
@@ -770,7 +770,7 @@ public class MainSystem {
 			System.out.println("Invalid priority.");
 		}
 
-		// ===== Create Report =====
+		// Create Report
 		maintenanceManager.createMaintenance(facilityId, currentUser.getUserId(), description, priority);
 
 		System.out.println("Maintenance report created.");
@@ -804,7 +804,9 @@ public class MainSystem {
 		List<Integer> counts = bookingManager.getCounts();
 		List<Double> hours = bookingManager.getHours();
 		List<String> peakHours = bookingManager.getPeakHoursPerFacility(facilityIds);
-	
+		List<Integer> maintenanceCounts = maintenanceManager.getMaintenanceCounts(facilityIds);
+		List<Double> avgRepairTime = maintenanceManager.getAverageRepairTime(facilityIds);
+		
 		if (facilityIds.isEmpty()) {
 			System.out.println("No data.");
 			return;
@@ -813,8 +815,8 @@ public class MainSystem {
 		YearMonth now = YearMonth.now();
 		int totalHours = now.lengthOfMonth() * 24;
 	
-		System.out.printf("%-10s %-20s %-13s %-13s %-13s\n", "Facility", "Facility", "Numbers of", "Utilization", "Peak");
-		System.out.printf("%-10s %-20s %-13s %-13s %-13s\n", "ID", "Name", "booking", "Rate", "Hour");
+		System.out.printf("%-10s %-20s %-13s %-13s %-7s %-13s %-10s\n", "Facility", "Facility", "Numbers of", "Utilization", "Peak", "Numbers of", "Avg Repair");
+		System.out.printf("%-10s %-20s %-13s %-13s %-7s %-13s %-10s\n", "ID", "Name", "booking", "Rate", "Hour", "maintenance", "Time(day)");
 		System.out.println("----------------------------------------------------------");
 	
 		double maxRate = 0;
@@ -826,13 +828,16 @@ public class MainSystem {
 			int count = counts.get(i);
 			double h = hours.get(i);
 			String peak = peakHours.get(i);
+			int mCount = maintenanceCounts.get(i);
+			double avgTime = avgRepairTime.get(i);
 		
 			Facility f = bookingManager.getFacilityById(id);
 			String name = (f != null) ? f.getFacilityName() : "Unknown";
 		
 			double rate = (h / totalHours) * 100;
 		
-			System.out.printf("%-10s %-20s %-13d %-9.2f%% %-13s\n", id, name, count, rate, "    " + peak+":00");
+			System.out.printf("%-10s %-20s %-13d %-9.2f%% %-10s %-13d %-10.2f\n", 
+								id, name, count, rate, "   " + peak+":00", mCount, avgTime);
 		
 			if (rate > maxRate) {
 				maxRate = rate;
@@ -861,6 +866,109 @@ public class MainSystem {
 		System.out.println("Facility with Highest Utilization: " + maxFacility);
 		System.out.println("This report only generate from APPROVED bookings.");
 		System.out.println("=============================================");
+	}
+	
+	private void handleAssignMaintenance() {
+
+		List<MaintenanceReport> list = maintenanceManager.getPendingReports();
+
+		if (list.isEmpty()) {
+			System.out.println("\nNo pending reports.");
+			return;
+		}
+	
+		System.out.println("\n===== Pending Reports =====");
+		System.out.printf("%-10s %-10s %-15s %-25s\n","ReportID", "Facility", "Date", "Description");
+	
+		for (MaintenanceReport r : list) {
+			System.out.printf("%-10s %-10s %-15s %-25s\n",
+					r.getReportId(), r.getFacilityId(), r.getReportDate(), r.getDescription());
+		}
+	
+		MaintenanceReport selected = null;
+	
+		while (true) {
+	
+			System.out.print("\nEnter Report ID (0 to back): ");
+			String id = scanner.nextLine();
+	
+			if (id.equals("0")) return;
+	
+			selected = maintenanceManager.findReportById(id);
+	
+			if (selected == null ||
+				selected.getStatus() != MaintenanceStatus.PENDING) {
+				System.out.println("Invalid selection.");
+				continue;
+			}
+	
+			break;
+		}
+	
+		int choice;
+	
+		while (true) {
+			System.out.println("\n1. Approve");
+			System.out.println("2. Reject");
+	
+			choice = getMenuChoice();
+	
+			if (choice == 1 || choice == 2) break;
+			System.out.println("Invalid choice.");
+		}
+	
+		String technician = null;
+	
+		if (choice == 1) {
+			while (true) {
+				System.out.print("Enter technician name: ");
+				technician = scanner.nextLine();
+	
+				if (technician.trim().isEmpty()) {
+					System.out.println("Cannot be empty.");
+					continue;
+				}
+				break;
+			}
+		}
+	
+		maintenanceManager.processAssignment(selected, currentUser.getUserId(), technician, choice == 1);
+	
+		System.out.println("Task processed.");
+	}
+	
+	private void handleCompleteMaintenance() {
+
+		List<MaintenanceReport> list = maintenanceManager.getInProgressReports();
+
+		if (list.isEmpty()) {
+			System.out.println("\nNo IN_PROGRESS maintenance tasks.");
+			return;
+		}
+
+		System.out.println("\n===== IN_PROGRESS Maintenance =====");
+		System.out.printf("%-10s %-10s %-15s %-25s\n", "ReportID", "Facility", "Start Date", "Description");
+
+		for (MaintenanceReport r : list) {
+			System.out.printf("%-10s %-10s %-15s %-25s\n", r.getReportId(), r.getFacilityId(), r.getStartDate(), r.getDescription());
+		}
+
+		while (true) {
+			System.out.print("\nEnter Report ID to complete (0 to back): ");
+			String id = scanner.nextLine();
+
+			if (id.equals("0")) return;
+
+			boolean success = maintenanceManager.completeMaintenance(id);
+
+			if (!success) {
+				System.out.println("Invalid selection or not IN_PROGRESS.");
+				continue;
+			}
+
+			System.out.println("Maintenance marked as COMPLETED.");
+			break;
+		}
 	}
 
 	// Notification

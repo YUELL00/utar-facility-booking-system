@@ -97,165 +97,67 @@ public class MaintenanceManager {
 		String reportId = String.format("R%03d", reports.size() + 1);
 		LocalDate reportDate = LocalDate.now();
 		
-		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, "UNASSIGNED",
-									description, reportDate, null, null, MaintenanceStatus.PENDING, priority);
-		
+		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, "UNASSIGNED", "UNASSIGNED", 
+											description, reportDate, null, null, MaintenanceStatus.PENDING, priority);
+	
 		reports.add(report);
 		saveReports();
 	}
 	
-	public void assignMaintenance() {//WIP
-		MaintenanceReport report = null;
-		int i = 0;  
-		String currentUserId = currentUser.getUserId();
-		int choice;
-		String reportId;
-		while(true) {
-			boolean found = false;
-			
-			System.out.print("Enter report id(Ex:R001)/(Enter 0 to exit): ");
-			reportId = input.nextLine();
-			
-			if (reportId.equals("0")) {
-				System.out.println("\nExit...");
-				return;
-			}
-			
-			if(checkReportId(reportId)) {
-				
-				for(MaintenanceReport r : reports) {
-				
-					if(r.getReportId().equals(reportId)) {
-						report = r;
-						found = true;
-						break;
-					}else {
-						i++;
-					}
-				}
-				
-				if(!found) {
-					System.out.println("No report found");
-					break;
-				}			
+	public List<MaintenanceReport> getPendingReports() {
+		List<MaintenanceReport> list = new ArrayList<>();
+		for (MaintenanceReport r : reports) {
+			if (r.getStatus() == MaintenanceStatus.PENDING) {
+				list.add(r);
 			}
 		}
-		
-		//Approve or Reject the Maintenance task
-		System.out.println("1. Approve");
-		System.out.println("2. Reject");
-		do {
-			System.out.println("Your choice: ");
-			choice = Integer.parseInt(input.nextLine());
-			switch(choice) {
-			case 1:
-				report.updateTaskStatus(MaintenanceStatus.APPROVED);
-				report.assignTo(currentUserId);
-				break;
-			case 2:
-				report.updateTaskStatus(MaintenanceStatus.REJECTED);
-				report.assignTo(currentUserId);
-				break;
-			case 0:
-				return;
-			default:
-				System.out.println("Invalid Input");
-				break;
-			}
-		} while(choice < 0 && choice > 2);
-				
-		
-		reports.set(i, report);
-				
-		saveReports();
-		System.out.println("Tasks assigned successfully");
-		//end
+		return list;
 	}
 	
-	public void updateMaintenanceStatus() {
-		MaintenanceReport report = null;
-		int i = 0;  
-		String currentUserId = currentUser.getUserId();
-		int choice;
-		String reportId;
-		LocalDate startDate = null;
-		while(true) {
-			boolean found = false;
-			
-			System.out.print("Enter report id(Ex:R001)/(Enter 0 to exit): ");
-			reportId = input.nextLine();
-			
-			if (reportId.equals("0")) {
-				System.out.println("\nExit...");
-				return;
-			}
-			
-			if(checkReportId(reportId)) {
-				
-				for(MaintenanceReport r : reports) {
-				
-					if(r.getReportId().equals(reportId)) {
-						report = r;
-						found = true;
-						break;
-					}else {
-						i++;
-					}
-				}
-				
-				if(!found) {
-					System.out.println("No report found");
-					break;
-				}			
+	public MaintenanceReport findReportById(String reportId) {
+		for (MaintenanceReport r : reports) {
+			if (r.getReportId().equals(reportId)) {
+				return r;
 			}
 		}
-		System.out.print("\n====================");
-		System.out.print("1. In Progress");
-		System.out.print("2. Complete");
-		System.out.print("0. Back");
-		
-		do {
-			System.out.println("Choose the status: ");
-			choice = Integer.parseInt(input.nextLine());
-			switch(choice) {
-			case 1:
-				report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
-				while(true){
-					System.out.print("\nEnter new date(Ex:2026-05-02): ");
-					String inputDate = input.nextLine();
-					
-					try {
-						
-						startDate = LocalDate.parse(inputDate);
-						
-						if(startDate.isBefore(LocalDate.now())) {
-							System.out.println("\nInvalid Date! (Past)");
-							System.out.println("Please Re-enter: ");
-							continue;	//restart from while loop header
-						}
-						break;
-					}
-					catch(Exception e) {
-						System.out.println("\nFalse Date Format!");
-						System.out.println("Please Re-enter: ");
-					}
-				}
-				report.setStartDate(startDate);
-				reports.set(i, report);
-				break;
-				
-			case 2:
-				report.updateTaskStatus(MaintenanceStatus.COMPLETED);
-				report.setEndDate(LocalDate.now());
-				reports.set(i, report);
-				break;
-			case 0:
-				return;
-			default:
-				System.out.println("Invalid Input");
-				break;
+		return null;
+	}
+	
+	public void processAssignment(MaintenanceReport report, String adminId, String technician, boolean isApproved) {
+		if (isApproved) {
+			report.assignTo(adminId, technician);
+			report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
+			} else {
+				report.assignTo(adminId, "N/A");
+				report.updateTaskStatus(MaintenanceStatus.REJECTED);
 			}
-		} while(choice < 0 && choice > 2);
+		saveReports();
+	}
+	
+	public boolean completeMaintenance(String reportId) {
+		for (MaintenanceReport r : reports) {
+			if (r.getReportId().equals(reportId)) {
+				if (r.getStatus() != MaintenanceStatus.IN_PROGRESS) {
+					return false;
+				}
+				r.updateTaskStatus(MaintenanceStatus.COMPLETED);
+				r.setEndDate(LocalDate.now());
+
+				saveReports();
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public List<MaintenanceReport> getInProgressReports() {
+		List<MaintenanceReport> list = new ArrayList<>();
+		for (MaintenanceReport r : reports) {
+			if (r.getStatus() == MaintenanceStatus.IN_PROGRESS) {
+				list.add(r);
+			}
+		}
+		return list;
 	}
 	
 	public List<MaintenanceReport> getMaintenanceHistory(User user) {	
@@ -331,6 +233,58 @@ public class MaintenanceManager {
 		System.out.println("\nAverage Repair Time (day): " + average);
 		
 		System.out.println("\n=================================");
+	}
+	
+	public List<Integer> getMaintenanceCounts(List<String> facilityIds) {
+		List<Integer> counts = new ArrayList<>();
+		for (String id : facilityIds) {
+			int count = 0;
+			for (MaintenanceReport r : reports) {
+				if (!r.getFacilityId().equals(id))
+					continue;
+				if (r.getStatus() == MaintenanceStatus.REJECTED)
+					continue;
+				
+				count++;
+			}
+			counts.add(count);
+		}
+		return counts;
+	}
+	
+	public List<Double> getAverageRepairTime(List<String> facilityIds) {
+
+		List<Double> avgList = new ArrayList<>();
+
+		for (String id : facilityIds) {
+			double totalDays = 0;
+			int count = 0;
+
+			for (MaintenanceReport r : reports) {
+
+				if (!r.getFacilityId().equals(id))
+					continue;
+
+				if (r.getStatus() != MaintenanceStatus.COMPLETED)
+					continue;
+
+				if (r.getStartDate() == null || r.getEndDate() == null)
+					continue;
+
+				long days = ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
+
+				totalDays += days;
+				count++;
+			}
+
+			if (count == 0) {
+				avgList.add(0.0);
+			} else {
+				avgList.add(totalDays / count);
+			}
+		}
+
+		return avgList;
 	}
 	
 	public void loadReports() {
