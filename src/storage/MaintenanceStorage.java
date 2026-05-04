@@ -44,7 +44,7 @@ public class MaintenanceStorage extends BaseStorage{
 					startDate = LocalDate.parse(p[7]);
 				}
 				LocalDate endDate;
-				if (p[7].equals("null") || p[8].equals("NULL") || p[8].isEmpty()) {
+				if (p[8].equals("null") || p[8].equals("NULL") || p[8].isEmpty()) {
 					endDate = null;
 				} else {
 					endDate = LocalDate.parse(p[8]);

@@ -157,6 +157,7 @@ public class MaintenanceManager {
 	public void processAssignment(MaintenanceReport report, String adminId, String technician, boolean isApproved) {
 		if (isApproved) {
 			report.assignTo(adminId, technician);
+			report.setStartDate(LocalDate.now());
 			report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
 			} else {
 				report.assignTo(adminId, "N/A");
