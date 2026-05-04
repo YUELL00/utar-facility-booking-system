@@ -3,6 +3,7 @@ package maintenance;
 import java.time.*;
 import java.util.*;
 
+import booking.TimeSlot;
 import facility.*;
 import storage.*;
 import user.*;
@@ -102,6 +103,36 @@ public class MaintenanceManager {
 	
 		reports.add(report);
 		saveReports();
+	}
+	
+	public boolean isUnderMaintenance(String facilityId, TimeSlot ts) {
+		for (MaintenanceReport r : reports) {
+			
+			if (!r.getFacilityId().equals(facilityId))
+				continue;
+			
+			if (r.getStatus() == MaintenanceStatus.IN_PROGRESS)
+				continue;
+				
+			if (r.getStartDate() == null)
+				continue;
+			
+			LocalDate start = r.getStartDate();
+			LocalDate end = r.getEndDate();
+			LocalDate queryDate = ts.getDate();
+			
+			if (end == null) {
+				if (!queryDate.isBefore(start)) {
+					return true;
+				}
+			} else {
+				if ((queryDate.isEqual(start) || queryDate.isAfter(start)) && 
+						(queryDate.isEqual(end) || queryDate.isBefore(end))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	public List<MaintenanceReport> getPendingReports() {

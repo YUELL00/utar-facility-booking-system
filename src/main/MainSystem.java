@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import user.*;
 import facility.*;
+import facility.FacilityManager.AvailabilityStatus;
 import booking.*;
 import maintenance.*;
 import util.*;
@@ -502,11 +503,14 @@ public class MainSystem {
 		
 		for (Facility f : selectedList) {
 			
-			if (!f.checkAvailability()) continue;
-			if (bookingManager.isBooked(f.getFacilityId(), ts)) continue;
+			AvailabilityStatus status = facilityManager.checkAvailability(f, ts, bookingManager, maintenanceManager);
 			
-			System.out.println("- " + f.getFacilityName());
-			found = true;
+			if (status == AvailabilityStatus.AVAILABLE) {
+				System.out.println("- " + f.getFacilityName());
+				found = true;
+			} else if (status == AvailabilityStatus.UNDER_MAINTENANCE) {
+				System.out.println("- " + f.getFacilityName() + " (Under Maintenance)");
+			}
 		}
 		
 		if (!found) {

@@ -1,10 +1,12 @@
 package facility;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
 import booking.BookingManager;
 import booking.TimeSlot;
+import maintenance.MaintenanceManager;
 import storage.FacilityStorage;
 
 public class FacilityManager {
@@ -42,85 +44,92 @@ public class FacilityManager {
 		return result;
 	}
 	
-	// search facility
-	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end, 
-											String type, BookingManager bookingManager) {
+	public enum AvailabilityStatus {
+		AVAILABLE,
+		BOOKED,
+		UNDER_MAINTENANCE
+	}
 	
-		// 1. Validate Input
-		if (date == null || date.isEmpty() || start == null || end == null) {
-			throw new IllegalArgumentException("Invalid input");
+	public AvailabilityStatus checkAvailability(Facility f, TimeSlot ts, BookingManager bookingManager, MaintenanceManager maintenanceManager) {
+
+		if (maintenanceManager.isUnderMaintenance(f.getFacilityId(), ts)) {
+			return AvailabilityStatus.UNDER_MAINTENANCE;
+		}
+		
+		if (bookingManager.isBooked(f.getFacilityId(), ts)) {
+			return AvailabilityStatus.BOOKED;
+		}
+		
+		return AvailabilityStatus.AVAILABLE;
+	}
+	
+	public boolean isAvailable(Facility f, TimeSlot ts, BookingManager bookingManager, MaintenanceManager maintenanceManager) {
+
+		// booking conflict
+		if (bookingManager.isBooked(f.getFacilityId(), ts)) {
+			return false;
 		}
 
-		TimeSlot ts = new TimeSlot(java.time.LocalDate.parse(date), start, end);
+		// maintenance conflict
+		if (maintenanceManager.isUnderMaintenance(f.getFacilityId(), ts)) {
+			return false;
+		}
 
+		return true;
+	}
+	
+	// search facility
+	public List<Facility> searchFacilities(String date, LocalTime start, LocalTime end, String type, 
+											BookingManager bookingManager, MaintenanceManager maintenanceManager) {
+	
+		TimeSlot ts = new TimeSlot(LocalDate.parse(date), start, end);
+		
 		List<Facility> result = new ArrayList<>();
 
 		for (Facility f : facilities) {
+			
 			// type filter
 			if (type != null && !type.isEmpty() && !type.equalsIgnoreCase(f.getFacilityType())) {
 				continue;
 			}
 
-			// status filter
-			if (!f.checkAvailability()) {
-				continue;
-			}
-
-			// check booking conflict
-			if (bookingManager.isBooked(f.getFacilityId(), ts)) {
-				continue;
-			}
+			// check avaibility
+			if (!isAvailable(f, ts, bookingManager, maintenanceManager)) {
+	            continue;
+	        }
 	        result.add(f);
 	    }
 	    return result;
 	}
 
 	// get all available
-	public List<Facility> getAvailableFacilities() {
+	public List<Facility> getAvailableFacilities(TimeSlot ts, BookingManager bookingManager, MaintenanceManager maintenanceManager) {
 		List<Facility> result = new ArrayList<>();
 		
 		for (Facility f : facilities) {
-			if (f.checkAvailability()) {
+			if (isAvailable(f, ts, bookingManager, maintenanceManager)) {
 				result.add(f);
-				}
 			}
+		}
 
 		return result;
-		}
-
-	// update facility availability
-	public void updateFacilityAvailability(String facilityId, String status) {
-
-		for (Facility f : facilities) {
-
-			if (f.getFacilityId() != null &&
-					f.getFacilityId().equals(facilityId)) {
-				
-				f.updateStatus(status);
-				saveFacilities();
-				System.out.println("Facility updated.");
-				return;
-				}
-			}
-		
-		System.out.println("Facility not found.");
-		}
+	}
 
 	// generate report
-	public String generateUtilizationReport() {
+	public String generateUtilizationReport(TimeSlot ts, BookingManager bookingManager, MaintenanceManager maintenanceManager) {
 		
 		int total = facilities.size();
 		int available = 0;
 		
 		for (Facility f : facilities) {
-			if (f.checkAvailability()) {
+			if (isAvailable(f, ts, bookingManager, maintenanceManager)) {
 				available++;
-				}
 			}
+		}
 		
 		return String.format(
 				"Total Facilities: %d\nAvailable: %d\nUnavailable: %d",
 				total, available, total - available);
-		}
+	}
 	
 }

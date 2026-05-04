@@ -36,17 +36,16 @@ public class BookingManager{
 	}
 
 	public boolean isBooked(String facilityId, TimeSlot timeSlot) {
-
 		for (Booking b : bookings) {
-
-			if (b.getFacilityId().equals(facilityId)) {
-
-				if (b.getTimeSlot().overlaps(timeSlot)) {
-					return true;
-				}
+			if (!b.getFacilityId().equals(facilityId)) continue;
+			
+			if (b.getStatus() != BookingStatus.APPROVED && b.getStatus() != BookingStatus.PENDING)
+				continue;
+			
+			if (b.getTimeSlot().overlaps(timeSlot)) {
+				return true;
 			}
 		}
-
 		return false;
 	}
 	

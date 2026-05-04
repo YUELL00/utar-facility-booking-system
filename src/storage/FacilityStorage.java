@@ -21,7 +21,7 @@ public class FacilityStorage extends BaseStorage{
         		String line=sc.nextLine();
         		String[] p=line.split(",",-1);
 
-        		if(p.length<5){
+        		if(p.length < 4){
         			continue;
         		}
 	
@@ -29,9 +29,8 @@ public class FacilityStorage extends BaseStorage{
 	        	String facilityName = p[1];
 	        	String facilityType = p[2];
 	        	String location = p[3];
-	        	String status = p[4];
 	
-	        	Facility facility = new Facility(facilityId, facilityName, facilityType, location, status);
+	        	Facility facility = new Facility(facilityId, facilityName, facilityType, location);
 	
 	        	list.add(facility);
 	        }
@@ -51,7 +50,7 @@ public class FacilityStorage extends BaseStorage{
 			for(Facility f : list){
 
 				String line = f.getFacilityId() + "," + f.getFacilityName()+"," +
-							f.getFacilityType() + "," + f.getLocation() + "," + f.getStatus(); 
+							f.getFacilityType() + "," + f.getLocation(); 
 				writer.println(line);
 			}
 
