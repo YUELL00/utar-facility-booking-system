@@ -868,7 +868,7 @@ public class MainSystem {
 		}
 
 		System.out.println("Most Frequently Used Facility Type: " + topType);
-		System.out.println("Facility with Highest Utilization: " + maxFacility);
+		System.out.println("Facility with Highest Utilization Rate: " + maxFacility);
 		System.out.println("This report only generate from APPROVED bookings.");
 		System.out.println("=============================================");
 		
@@ -889,9 +889,9 @@ public class MainSystem {
 		}
 		
 		if (maxMaintenance == 0) {
-			System.out.println("Facilities with highest maintenance issues: None");
+			System.out.println("Facilities with highest number of maintenance issues: None");
 		} else {
-			System.out.println("Facilities with highest maintenance issues:");
+			System.out.println("Facilities with highest number of maintenance issues:");
 			
 			for (String id : topFacilities) {
 				Facility f = bookingManager.getFacilityById(id);
