@@ -2,7 +2,9 @@ package main;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import user.*;
@@ -104,6 +106,7 @@ public class MainSystem {
 					
 				//booking.getCurrentUser
 				bookingManager.setCurrentUser(user);
+				maintenanceManager.setCurrentUser(user);
 	
 				System.out.println("Login successful.");
 				break;
@@ -262,15 +265,6 @@ public class MainSystem {
 		System.out.println("0. Exit");
 	}
 
-	public void displayReportsMenu() {
-
-		System.out.println("\n========= Reports Menu =========");
-		System.out.println("1. Facility Utilization");
-		System.out.println("2. Peak Booking");
-		System.out.println("3. Maintenance Report");
-		System.out.println("0. Back");
-	}
-
 	public int getMenuChoice() {
 
 		System.out.print("Enter choice: ");
@@ -298,21 +292,25 @@ public class MainSystem {
 				case 1:
 				handleViewProfile();
 				break;
-			
+
 				case 2:
 				handleFacilitySearch();
 				break;
-			
+
 				case 3:
 				handleBookingMenu(user);
 				break;
-			
+
 				case 4:
 				handleMaintenanceMenu(user);
 				break;
 			
 				case 5:
 				handleReportsMenu();
+				
+				if(currentUser.getRole().equals("Admin")) {
+					handleAdminMaintenanceReport();
+				}
 				break;
 			
 				case 6:
@@ -433,7 +431,7 @@ public class MainSystem {
 		System.out.println("\n======= Facility Search =======");
 		List<Facility> selectedList;
 		
-		// ===== Step 1: choose type =====
+		// choose type
 		while (true) {
 			
 			System.out.print("Enter facility type (or 1 to view list): ");
@@ -456,7 +454,7 @@ public class MainSystem {
 			break;
 		}
 		
-		// ===== Step 2: keyin type =====
+		// keyin type
 		
 		String dateStr;
 		LocalDate date;
@@ -497,7 +495,7 @@ public class MainSystem {
 		
 		TimeSlot ts = new TimeSlot(date, start, end);
 		
-		// ===== Step 3: check facility =====
+		// check facility
 		System.out.println("\nAvailable Facilities:");
 		
 		boolean found = false;
@@ -519,12 +517,13 @@ public class MainSystem {
 	private void printFacilityList(List<Facility> list) {
 		System.out.println("\n===== Facility List =====");
 		
-		System.out.printf("%-5s %-20s %-15s\n", "No.", "Name", "Type");
+		System.out.printf("%-5s %-8s %-25s %-15s\n","No.", "ID", "Name", "Type");
 		System.out.println("------------------------------------------");
 		
 		int i = 1;
 		for (Facility f : list) {
-			System.out.printf("%-5d %-20s %-15s\n", i++, f.getFacilityName(), f.getFacilityType());
+			System.out.printf("%-5d %-8s %-25s %-15s\n", i++, f.getFacilityId(), 
+								f.getFacilityName(), f.getFacilityType());
 		}
 	}
 
@@ -553,7 +552,6 @@ public class MainSystem {
 			switch (choice) {
 		
 				case 1:
-					// 简化：只调用 manager 
 					System.out.println("\nCreating booking...");
 					bookingManager.createBooking();
 					break;
@@ -617,12 +615,11 @@ public class MainSystem {
 	private void handleMaintenanceMenu(User user) {
 
 		System.out.println("\n======= Maintenance Menu =======");
-		System.out.println("1. Create Report");
-		System.out.println("2. View History Report");
-		System.out.println("3. View Feedback");
+		System.out.println("1. Reporting Issue");
+		System.out.println("2. View History");
 		if(user.getRole().equals("Admin")) {
-			System.out.println("4. Assign Maintenance Task");
-			System.out.println("5. Update Maintenance Task");
+			System.out.println("3. Assign Maintenance Task");
+			System.out.println("4. Update Maintenance Task");
 		}
 		
 		System.out.println("0. Back");
@@ -633,22 +630,18 @@ public class MainSystem {
 	
 			case 1:
 			System.out.println("Creating maintenance report...");
-			maintenanceManager.createMaintenanceReport();
+			handleCreateMaintenanceReport();
 			break;
 		
 			case 2:
-			maintenanceManager.getMaintenanceHistory(user);
+			handleViewMaintenanceHistory(user);
 			break;
-		
+			
 			case 3:
-			
-			break;
-			
-			case 4:
 			maintenanceManager.assignMaintenance();
 			break;
 			
-			case 5:
+			case 4:
 			maintenanceManager.updateMaintenanceStatus();
 			
 			default:
@@ -658,33 +651,216 @@ public class MainSystem {
 
 	// Reports
 	private void handleReportsMenu() {
+		
+		List<String> facilityIds = bookingManager.getUserFacilityIds(currentUser);
+		List<Integer> counts = bookingManager.getCounts();
 
-		while (true) {
+		System.out.println("\n===== Facility Usage Report =====\n");
+
+		if (facilityIds.isEmpty()) {
+			System.out.println("No booking records found.");
+			return;
+		}
+
+		System.out.printf("%-12s %-20s %-10s\n", "Facility ID", "Facility Name", "Numbers of booking");
+		System.out.println("------------------------------------------------");
+
+		int total = 0;
+
+		for (int i = 0; i < facilityIds.size(); i++) {
+
+			String id = facilityIds.get(i);
+			int count = counts.get(i);
 	
-			displayReportsMenu();
-			int choice = getMenuChoice();
-		
-			switch (choice) {
-		
-				case 1:
-				System.out.println(facilityManager.generateUtilizationReport());
-				break;
+			Facility f = bookingManager.getFacilityById(id);
+			String name;
+
+			if (f != null) {
+				name = f.getFacilityName();
+			} else {
+				name = "Unknown";
+			}
 			
-				case 2:
-				bookingManager.generatePeakBookingReport();
-				break;
-			
-				case 3:
-				maintenanceManager.generateMaintenanceReport();
-				break;
-			
-				case 0:
-				return;
-			
-				default:
-				System.out.println("Invalid choice.");
+			System.out.printf("%-12s %-20s %-10d\n", id, name, count);
+			total += count;
+		}
+
+		// Summary
+		System.out.println("\n===== Summary =====");
+		System.out.println("Total Bookings: " + total);
+
+		// type analysis
+		List<String> types = bookingManager.getUserFacilityTypes(currentUser);
+		List<Integer> typeCounts = bookingManager.getTypeCounts();
+
+		String topType = null;
+		int max = 0;
+
+		for (int i = 0; i < types.size(); i++) {
+			if (typeCounts.get(i) > max) {
+				max = typeCounts.get(i);
+				topType = types.get(i);
 			}
 		}
+
+		double percentage;
+		if (total == 0) {
+			percentage = 0;
+		} else {
+			percentage = max * 100.0 / total;
+		}
+
+		System.out.println("Most Used Facility Type: " + topType);
+		System.out.println("Numbers of booking of most used facility type: " + max);
+		System.out.println("Propostion of total booking for most used facility type: " + percentage + "%");
+		System.out.println("This report only generate from APPROVED bookings.");
+	}
+	
+	private void handleCreateMaintenanceReport() {
+
+		System.out.println("\n=== Reporting Issues ===");
+		System.out.println("1. Maintenance Issues");
+		System.out.println("0. Back");
+
+		int choice = getMenuChoice();
+
+		if (choice == 0)
+			return;
+
+		if (choice != 1) {
+			System.out.println("Invalid choice.");
+			return;
+		}
+
+		// facility ID
+		String facilityId;
+
+		while (true) {
+			System.out.println("Enter Facility ID: ");
+			System.out.println("(Enter 1 to show facility list, enter 0 to back)");
+			facilityId = scanner.nextLine();
+			
+			if (facilityId.equals("0"))
+				return;
+			
+			List<Facility> result = facilityManager.findFacilities(facilityId);
+			
+			if (facilityId.equals("1")) {
+				printFacilityList(result);
+				continue;
+			}
+	
+			if (maintenanceManager.checkFacilityId(facilityId))
+				break;
+		}
+
+		// Description
+		System.out.print("Enter description: ");
+		String description = scanner.nextLine();
+
+		// priority
+		String priority;
+		while (true) {
+			System.out.print("Priority (LOW/MEDIUM/HIGH): ");
+			priority = scanner.nextLine().toUpperCase();
+			
+			if (priority.equals("LOW") || priority.equals("MEDIUM") || priority.equals("HIGH")) 
+				break;
+			
+			System.out.println("Invalid priority.");
+		}
+
+		// ===== Create Report =====
+		maintenanceManager.createMaintenance(facilityId, currentUser.getUserId(), description, priority);
+
+		System.out.println("Maintenance report created.");
+	}
+	
+	private void handleViewMaintenanceHistory(User user) {
+
+		List<MaintenanceReport> list = maintenanceManager.getMaintenanceHistory(user);
+
+		System.out.println("\n===== Maintenance History =====");
+
+		if (list.isEmpty()) {
+			System.out.println("No records found.");
+			return;
+		}
+
+		System.out.printf("%-10s %-10s %-15s %-30s\n", "ReportID", "Facility", "Date", "Description");
+		System.out.println("---------------------------------------------------------------");
+
+		for (MaintenanceReport r : list) {
+			System.out.printf("%-10s %-10s %-15s %-30s\n", r.getReportId(),
+							r.getFacilityId(), r.getReportDate(), r.getDescription());
+		}
+	}
+	
+	private void handleAdminMaintenanceReport() {
+
+		System.out.println("\n===== Admin Facility Utilization Report =====");
+	
+		List<String> facilityIds = bookingManager.getAllFacilityIds();
+		List<Integer> counts = bookingManager.getCounts();
+		List<Double> hours = bookingManager.getHours();
+		List<String> peakHours = bookingManager.getPeakHoursPerFacility(facilityIds);
+	
+		if (facilityIds.isEmpty()) {
+			System.out.println("No data.");
+			return;
+		}
+	
+		YearMonth now = YearMonth.now();
+		int totalHours = now.lengthOfMonth() * 24;
+	
+		System.out.printf("%-10s %-20s %-13s %-13s %-13s\n", "Facility", "Facility", "Numbers of", "Utilization", "Peak");
+		System.out.printf("%-10s %-20s %-13s %-13s %-13s\n", "ID", "Name", "booking", "Rate", "Hour");
+		System.out.println("----------------------------------------------------------");
+	
+		double maxRate = 0;
+		String maxFacility = null;
+	
+		for (int i = 0; i < facilityIds.size(); i++) {
+	
+			String id = facilityIds.get(i);
+			int count = counts.get(i);
+			double h = hours.get(i);
+			String peak = peakHours.get(i);
+		
+			Facility f = bookingManager.getFacilityById(id);
+			String name = (f != null) ? f.getFacilityName() : "Unknown";
+		
+			double rate = (h / totalHours) * 100;
+		
+			System.out.printf("%-10s %-20s %-13d %-9.2f%% %-13s\n", id, name, count, rate, "    " + peak+":00");
+		
+			if (rate > maxRate) {
+				maxRate = rate;
+				maxFacility = name;
+			}
+		}
+
+		// Summary
+		System.out.println("\n===== Summary =====");
+	
+		// most used type
+		List<String> types = bookingManager.getAllFacilityTypes();
+		List<Integer> typeCounts = bookingManager.getTypeCounts();
+	
+		String topType = null;
+		int max = 0;
+	
+		for (int i = 0; i < types.size(); i++) {
+			if (typeCounts.get(i) > max) {
+				max = typeCounts.get(i);
+				topType = types.get(i);
+			}
+		}
+
+		System.out.println("Most Frequently Used Facility Type: " + topType);
+		System.out.println("Facility with Highest Utilization: " + maxFacility);
+		System.out.println("This report only generate from APPROVED bookings.");
+		System.out.println("=============================================");
 	}
 
 	// Notification

@@ -9,14 +9,14 @@ import storage.*;
 public class BookingManager{
 	
 	Scanner input = new Scanner(System.in);
-
 	private ArrayList<Booking> bookings;
-	
 	private ArrayList<Facility> facilities;
-	
 	private BookingStorage bookingStorage;
-	
 	private FacilityStorage facilityStorage;
+	private User currentUser;
+	private List<Integer> tempCounts;
+	private List<Integer> tempTypeCounts;
+	private List<Double> tempHours;
 	
 	//constructor
 	public BookingManager() {
@@ -30,10 +30,8 @@ public class BookingManager{
 	}
 	
 	//current userId
-	private User currentUser;
 	
 	public void setCurrentUser(User user) {
-		
 		this.currentUser = user;
 	}
 
@@ -588,8 +586,6 @@ public class BookingManager{
 			}
 		}
 	}
-		
-	
 	
 	//admin only (case 7)
 	public void rejectBooking() {
@@ -839,80 +835,248 @@ public class BookingManager{
 		return result;
 	}
 	
+	public List<Booking> getUserBookings(User user) {
+	    List<Booking> result = new ArrayList<>();
 
-	//Map = a refer table (through Key get Value)
-	public Map<String, Integer> getPeakBookingHours() {
+	    for (Booking b : bookings) {
+	        if (b.getUserId().equals(user.getUserId())) {
+	            result.add(b);
+	        }
+	    }
+	    return result;
+	}
 	
-		//HashMap = a statistic table
-		Map<String, Integer> hourCount = new HashMap<>();
+	public List<String> getUserFacilityIds(User user) {
+
+		List<String> facilityIds = new ArrayList<>();
+		List<Integer> counts = new ArrayList<>();
+
+		for (Booking b : bookings) {
+
+			if (!b.getUserId().equals(user.getUserId()))
+				continue;
+
+			if (b.getStatus() == BookingStatus.CANCELLED ||
+					b.getStatus() == BookingStatus.REJECTED)
+				continue;
+
+			String facilityId = b.getFacilityId();
+			
+			int index = facilityIds.indexOf(facilityId);
+
+			if (index == -1) {
+				facilityIds.add(facilityId);
+				counts.add(1);
+			} else {
+				counts.set(index, counts.get(index) + 1);
+			}
+		}
+		this.tempCounts = counts;
+		return facilityIds;
+	}
+	
+	public List<Integer> getCounts() {
+		return tempCounts;
+	}
+	
+	public Facility getFacilityById(String facilityId) {
+		for (Facility f : facilities) {
+			if (f.getFacilityId().equals(facilityId)) {
+				return f;
+			}
+		}
+		return null;
+	}
+
+	public List<String> getUserFacilityTypes(User user) {
 		
-		for(Booking b : bookings) {
+		List<String> types = new ArrayList<>();
+	    List<Integer> counts = new ArrayList<>();
+
+		for (Booking b : bookings) {
 			
-			LocalTime startTime = b.getTimeSlot().getStartTime();
-			LocalTime endTime = b.getTimeSlot().getEndTime();
+			if (!b.getUserId().equals(user.getUserId()))
+				continue;
 			
-			//loop from start until end（not include end）
-			//Ex: "10:00 - 12:00", hour = "10", "11"
-			while(startTime.isBefore(endTime)) {
-				
-				//cut hour only("10:30" → "10")
-				String hour = String.format("%02d", startTime.getHour());
-				
-				//hourCount.getOrDefault(hour, 0) + 1) 
-				//= if Map have the hour --> (the hour's count) then + 1
-				//= if Map haven't the hour --> (let the hour's count = 0) then + 1
-				hourCount.put(hour, hourCount.getOrDefault(hour, 0) + 1);
-				
-				startTime = startTime.plusHours(1);
+			if (b.getStatus() == BookingStatus.CANCELLED || b.getStatus() == BookingStatus.REJECTED)
+				continue;
+
+			Facility f = getFacilityById(b.getFacilityId());
+			if (f == null) 
+				continue;
+			
+			String type = f.getFacilityType();
+			
+			int index = types.indexOf(type);
+			
+			if (index == -1) {
+				types.add(type);
+				counts.add(1);
+			} else {
+				counts.set(index, counts.get(index) + 1);
 			}
 		}
 		
-		return hourCount;
-		//Ex: 10 = 5
-		//hour = hourCount
+		this.tempTypeCounts = counts;
+		return types;
 	}
 	
+	public List<Integer> getTypeCounts() {
+		return tempTypeCounts;
+	}
 	
-	public void generatePeakBookingReport() {
+	public List<String> getAllFacilityIds() {
+
+		List<String> facilityIds = new ArrayList<>();
+		List<Integer> counts = new ArrayList<>();
+		List<Double> totalHours = new ArrayList<>();
 		
-		//call getPeakBookingHours() method to get result
-		Map<String, Integer> hourCount = getPeakBookingHours();
-		
-		//TreeMap = Ascending
-		Map<String, Integer> report = new TreeMap<>(hourCount);
-		
-		System.out.println("\n====== Peak Booking Report ======");
-		
-		//entry = (Key + Value) , Ex: "10" --> 5
-		for(Map.Entry<String, Integer> entry : report.entrySet()) {
+		YearMonth currentMonth = YearMonth.now();
+		LocalDateTime monthStart = currentMonth.atDay(1).atStartOfDay();
+		LocalDateTime monthEnd = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
+
+		for (Booking b : bookings) {
+
+			if (b.getStatus() == BookingStatus.CANCELLED || b.getStatus() == BookingStatus.REJECTED)
+				continue;
+	
+			String id = b.getFacilityId();
 			
-			System.out.println(entry.getKey() + ":00 --> " + 
-			entry.getValue() + " bookings");
+			LocalDateTime start = LocalDateTime.of(b.getTimeSlot().getDate(), b.getTimeSlot().getStartTime());
+			LocalDateTime end = LocalDateTime.of(b.getTimeSlot().getDate(), b.getTimeSlot().getEndTime());
+	
+			if (end.isBefore(monthStart) || start.isAfter(monthEnd)) {
+				continue;
+			}
+
+			LocalDateTime actualStart;
+			if (start.isBefore(monthStart)) {
+				actualStart = monthStart;
+			} else {
+				actualStart = start;
+			}
+			LocalDateTime actualEnd;
+			if (end.isAfter(monthEnd)) {
+				actualEnd = monthEnd;
+			} else {
+				actualEnd = end;
+			}
+			double hours = Duration.between(actualStart, actualEnd).toMinutes() / 60.0;
 			
-			//Ex: 10:00 --> 5 bookings
+			int index = facilityIds.indexOf(id);
+			
+			// calculate hours
+			if (index == -1) {
+				facilityIds.add(id);
+				counts.add(1);
+				totalHours.add(hours);
+			} else {
+				counts.set(index, counts.get(index) + 1);
+				totalHours.set(index, totalHours.get(index) + hours);
+			}
 		}
-		System.out.println("\n=================================");
+
+		this.tempCounts = counts;
+		this.tempHours = totalHours;
+		return facilityIds;
 	}
 	
+	public List<Double> getHours() {
+		return tempHours;
+	}
+	
+	public List<String> getAllFacilityTypes() {
+
+		List<String> types = new ArrayList<>();
+		List<Integer> counts = new ArrayList<>();
+
+		for (Booking b : bookings) {
+
+			if (b.getStatus() == BookingStatus.CANCELLED || b.getStatus() == BookingStatus.REJECTED)
+				continue;
+	
+			Facility f = getFacilityById(b.getFacilityId());
+			if (f == null) 
+				continue;
+	
+			String type = f.getFacilityType();
+			int index = types.indexOf(type);
+
+			if (index == -1) {
+				types.add(type);
+				counts.add(1);
+			} else {
+				counts.set(index, counts.get(index) + 1);
+			}
+		}
+
+		this.tempTypeCounts = counts;
+		return types;
+	}
+	
+	public List<String> getPeakHoursPerFacility(List<String> facilityIds) {
+
+		List<String> peakHours = new ArrayList<>();
+
+		for (String facilityId : facilityIds) {
+
+			List<String> hours = new ArrayList<>();
+			List<Integer> counts = new ArrayList<>();
+
+			for (Booking b : bookings) {
+
+				if (b.getStatus() == BookingStatus.CANCELLED || b.getStatus() == BookingStatus.REJECTED)
+					continue;
+
+				if (!b.getFacilityId().equals(facilityId))
+					continue;
+
+				LocalTime start = b.getTimeSlot().getStartTime();
+				LocalTime end = b.getTimeSlot().getEndTime();
+
+				// loop hour by hour
+				while (start.isBefore(end)) {
+	
+					String hour = String.format("%02d", start.getHour());
+	
+					int index = hours.indexOf(hour);
+	
+					if (index == -1) {
+						hours.add(hour);
+						counts.add(1);
+					} else {
+						counts.set(index, counts.get(index) + 1);
+					}
+		
+					start = start.plusHours(1);
+				}
+			}
+	
+			String peakHour = "-";
+			int max = 0;
+	
+			for (int i = 0; i < hours.size(); i++) {
+				if (counts.get(i) > max) {
+					max = counts.get(i);
+					peakHour = hours.get(i);
+				}
+			}
+			peakHours.add(peakHour);
+		}
+		return peakHours;
+	}
 	
 	public void loadFacilities() {
-		
 		facilities.clear();
-		
 		facilities = facilityStorage.load();
-		
 	}
 
 	public void loadBookings() {
-		
 		bookings.clear();
-		
 		bookings = bookingStorage.load();
-	
 	}
 
 	public void saveBookings() {
-		
 		bookingStorage.save(bookings);
 	}
 	

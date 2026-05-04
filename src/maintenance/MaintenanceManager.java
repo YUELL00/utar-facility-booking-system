@@ -25,13 +25,18 @@ public class MaintenanceManager {
 	
 	//constructor
 	public MaintenanceManager(){
+		this.maintenanceStorage = new MaintenanceStorage("maintenance.txt");
+		this.facilityStorage = new FacilityStorage("facilities.txt");
 		this.reports = new ArrayList<>();
 		this.facilities = new ArrayList<>();
 		
-		this.maintenanceStorage = new MaintenanceStorage("maintenance.txt");
-		this.facilityStorage = new FacilityStorage("facilities.txt");
-		
 		loadReports();
+		loadFacilities();
+	}
+	
+	public void loadFacilities() {
+		facilities.clear();
+		facilities = facilityStorage.load();
 	}
 	
 	private User currentUser;
@@ -88,73 +93,15 @@ public class MaintenanceManager {
 		
 	}
 	
-	public void createMaintenanceReport() { //feedback
-		String currentUserId = currentUser.getUserId();
-		LocalDate reportDate = null, startDate = null, endDate = null;
-		String facilityId, description;
-		int choice;
+	public void createMaintenance(String facilityId, String userId, String description, String priority) { 
+		String reportId = String.format("R%03d", reports.size() + 1);
+		LocalDate reportDate = LocalDate.now();
 		
-		System.out.println("===Issue Type===");
-		System.out.println("1. Feedback");
-		System.out.println("2. Maintenance");
-		System.out.println("0. Back");
+		MaintenanceReport report = new MaintenanceReport(reportId, facilityId, userId, "UNASSIGNED",
+									description, reportDate, null, null, MaintenanceStatus.PENDING, priority);
 		
-		do {
-			System.out.println("Choose the issue type you want to report: ");
-			choice = input.nextInt();
-			switch(choice) {
-			case 1: //feedback
-				String feedbackId = String.format("FB%03d", reports.size() + 1);
-				
-				while(true) {
-					System.out.println("Enter the facility Id (Ex: F001): ");
-					facilityId = input.nextLine();
-					if(!(checkFacilityId(facilityId))) {
-						System.out.println("Please Re-enter: ");
-					}else {
-						break;
-					}
-				}
-				
-				System.out.println("Enter the issue description: ");
-				description = input.nextLine();
-				
-				reportDate = LocalDate.now();
-				MaintenanceReport feedback = new MaintenanceReport(feedbackId, facilityId, currentUserId, description, reportDate);
-				System.out.println("Feedback created successfully");
-				break;
-				
-			case 2: //Maintenance issue
-				String reportId = String.format("R%03d", reports.size() + 1);
-				
-				while(true) {
-					System.out.println("Enter the facility Id (Ex: F001): ");
-					facilityId = input.nextLine();
-					if(!(checkFacilityId(facilityId))) {
-						System.out.println("Please Re-enter: ");
-					}else {
-						break;
-					}
-				}
-				
-				System.out.println("Enter the issue description: ");
-				description = input.nextLine();
-				
-				reportDate = LocalDate.now();
-				MaintenanceStatus status = MaintenanceStatus.PENDING;
-				MaintenanceReport report = new MaintenanceReport(reportId, facilityId, currentUserId, "NULL", description, reportDate, startDate, endDate, status, "LOW");
-				reports.add(report);
-				saveReports();
-				break;
-			
-			case 0:
-				return;
-				
-			default:
-				System.out.println("Invalid Input");
-				break;
-			}
-		}while(choice < 0 && choice > 2);
+		reports.add(report);
+		saveReports();
 	}
 	
 	public void assignMaintenance() {//WIP
@@ -199,7 +146,7 @@ public class MaintenanceManager {
 		System.out.println("2. Reject");
 		do {
 			System.out.println("Your choice: ");
-			choice = input.nextInt();
+			choice = Integer.parseInt(input.nextLine());
 			switch(choice) {
 			case 1:
 				report.updateTaskStatus(MaintenanceStatus.APPROVED);
@@ -215,7 +162,7 @@ public class MaintenanceManager {
 				System.out.println("Invalid Input");
 				break;
 			}
-		}while(choice < 0 && choice > 2);
+		} while(choice < 0 && choice > 2);
 				
 		
 		reports.set(i, report);
@@ -269,70 +216,61 @@ public class MaintenanceManager {
 		
 		do {
 			System.out.println("Choose the status: ");
-		choice = input.nextInt();
-		switch(choice) {
-		case 1:
-			report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
-			while(true){
-				System.out.print("\nEnter new date(Ex:2026-05-02): ");
-				String inputDate = input.nextLine();
-				
-				try {
+			choice = Integer.parseInt(input.nextLine());
+			switch(choice) {
+			case 1:
+				report.updateTaskStatus(MaintenanceStatus.IN_PROGRESS);
+				while(true){
+					System.out.print("\nEnter new date(Ex:2026-05-02): ");
+					String inputDate = input.nextLine();
 					
-					startDate = LocalDate.parse(inputDate);
-					
-					if(startDate.isBefore(LocalDate.now())) {
-						System.out.println("\nInvalid Date! (Past)");
-						System.out.println("Please Re-enter: ");
-						continue;	//restart from while loop header
+					try {
+						
+						startDate = LocalDate.parse(inputDate);
+						
+						if(startDate.isBefore(LocalDate.now())) {
+							System.out.println("\nInvalid Date! (Past)");
+							System.out.println("Please Re-enter: ");
+							continue;	//restart from while loop header
+						}
+						break;
 					}
-					break;
+					catch(Exception e) {
+						System.out.println("\nFalse Date Format!");
+						System.out.println("Please Re-enter: ");
+					}
 				}
-				catch(Exception e) {
-					System.out.println("\nFalse Date Format!");
-					System.out.println("Please Re-enter: ");
-				}
+				report.setStartDate(startDate);
+				reports.set(i, report);
+				break;
+				
+			case 2:
+				report.updateTaskStatus(MaintenanceStatus.COMPLETED);
+				report.setEndDate(LocalDate.now());
+				reports.set(i, report);
+				break;
+			case 0:
+				return;
+			default:
+				System.out.println("Invalid Input");
+				break;
 			}
-			report.setStartDate(startDate);
-			reports.set(i, report);
-			break;
-			
-		case 2:
-			report.updateTaskStatus(MaintenanceStatus.COMPLETED);
-			report.setEndDate(LocalDate.now());
-			reports.set(i, report);
-			break;
-		case 0:
-			return;
-		default:
-			System.out.println("Invalid Input");
-			break;
-		}
-	}while(choice < 0 && choice > 2);
+		} while(choice < 0 && choice > 2);
 	}
 	
-	public void getMaintenanceHistory(User currentUser){
+	public List<MaintenanceReport> getMaintenanceHistory(User user) {	
+		List<MaintenanceReport> result = new ArrayList<>();
 		
-		int i = 0;
-		if(currentUser.getRole().equals("Admin")) {
-			for(MaintenanceReport r : reports) {  
-				System.out.println(r);
-				i++;
-			}
-		}else {
-			//find by using user id
-			for(MaintenanceReport r : reports) {
-				if(r.getReportedByUserId().equals(currentUser.getUserId())) {
-					System.out.println(r);
-					i++;
+		if (user.getRole().equals("Admin")) {
+			result.addAll(reports);
+		} else {
+			for (MaintenanceReport r : reports) {
+				if (r.getReportedByUserId().equals(user.getUserId())) {
+					result.add(r);
 				}
 			}
 		}
-		if(i == 0) {
-			System.out.println("\nThere is no any report yet.");
-		}else {
-			System.out.println("\nAll report are shown.");
-		}
+		return result;
 	}
 	
 	public void getFrequentIssues() {//WIP
