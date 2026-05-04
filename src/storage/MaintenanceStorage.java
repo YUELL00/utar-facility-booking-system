@@ -52,8 +52,8 @@ public class MaintenanceStorage extends BaseStorage{
 				MaintenanceStatus status = MaintenanceStatus.valueOf(p[9].toUpperCase());
 				String priority=p[10];
 				
-				MaintenanceReport report = new MaintenanceReport(reportId,facilityId,reportedBy,assignedTo,
-											technicianName,description,reportDate,startDate,endDate,status,priority);
+				MaintenanceReport report = new MaintenanceReport(reportId,facilityId,reportedBy,technicianName, 
+											assignedTo,description,reportDate,startDate,endDate,status,priority);
 				
 				list.add(report);
 			}
