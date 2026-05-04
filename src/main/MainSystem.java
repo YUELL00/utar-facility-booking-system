@@ -3,6 +3,7 @@ package main;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -870,6 +871,34 @@ public class MainSystem {
 		System.out.println("Facility with Highest Utilization: " + maxFacility);
 		System.out.println("This report only generate from APPROVED bookings.");
 		System.out.println("=============================================");
+		
+		System.out.println("\n== ALERTS ==");
+		int maxMaintenance = 0;
+		List<String> topFacilities = new ArrayList<>();
+		
+		for (int i = 0; i < facilityIds.size(); i++) {
+			int mCount = maintenanceCounts.get(i);
+			
+			if (mCount > maxMaintenance) {
+				maxMaintenance = mCount;
+				topFacilities.clear();
+				topFacilities.add(facilityIds.get(i));
+			} else if (mCount == maxMaintenance) {
+				topFacilities.add(facilityIds.get(i));
+			}
+		}
+		
+		if (maxMaintenance == 0) {
+			System.out.println("Facilities with highest maintenance issues: None");
+		} else {
+			System.out.println("Facilities with highest maintenance issues:");
+			
+			for (String id : topFacilities) {
+				Facility f = bookingManager.getFacilityById(id);
+				String name = (f != null) ? f.getFacilityName() : "Unknown";
+				System.out.println("- " + id + " (" + name + "), Issues: " + maxMaintenance);
+			}
+		}
 	}
 	
 	private void handleAssignMaintenance() {
